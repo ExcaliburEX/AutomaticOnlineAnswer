@@ -20,12 +20,12 @@
 ---
 
 # ✨开始
-&emsp;&emsp;很简单只需两步，配置好chrome driver，下载release即可。
+&emsp;&emsp;很简单只需两步，配置好chrome driver，下载[release](https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/tag/V1.0)即可。
 ## 🍎 Chrome driver 配置
 &emsp;&emsp;在chrome的搜索栏输入`chrome://version`查看自己的版本，然后到[chromedriver](http://chromedriver.storage.googleapis.com/index.html)下载对应的chromedriver版本，随便放在哪个文件夹，并把当前文件夹加入到环境变量即可。
 
 ## 🍌 下载最新release
-&emsp;&emsp;下载release启动即可，以下是运行界面：
+&emsp;&emsp;下载[release](https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/tag/V1.0)启动即可，以下是运行界面：
 
 ![](https://blog-1259799643.cos.ap-shanghai.myqcloud.com/2020-05-16-%E6%88%AA%E5%9B%BE.png)
 
