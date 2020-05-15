@@ -1,4 +1,3 @@
 PySimpleGUI
 selenium
-threading
 requests
