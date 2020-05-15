@@ -7,7 +7,7 @@
 
 <div align="center">
 
-[![HitCount](http://hits.dwyl.com/ExcaliburEX/https://githubcom/ExcaliburEX/GHS.svg)](http://hits.dwyl.com/ExcaliburEX/https://github.com/ExcaliburEX/AutomaticOnlineAnswer)
+[![HitCount](http://hits.dwyl.com/ExcaliburEX/AutomaticOnlineAnswer.svg)](http://hits.dwyl.com/ExcaliburEX/AutomaticOnlineAnswer)
 [![Build Status](https://www.travis-ci.org/ExcaliburEX/AutomaticOnlineAnswer.svg?branch=master)](https://www.travis-ci.org/ExcaliburEX/AutomaticOnlineAnswer)
 [![GitHub Issues](https://img.shields.io/github/issues/ExcaliburEX/GHS.svg)](https://github.com/ExcaliburEX/AutomaticOnlineAnswer)
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/ExcaliburEX/GHS.svg)](https://github.com/ExcaliburEX/AutomaticOnlineAnswer/pulls)
