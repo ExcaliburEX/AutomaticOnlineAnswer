@@ -1,0 +1,4 @@
+PySimpleGUI
+selenium
+threading
+requests
