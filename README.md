@@ -33,7 +33,7 @@
 &emsp;&emsp;每次运行需先点击登录按钮，在自动打开的网页中输入验证码点击页面的“登录”即可，浏览器会自动关闭。后面就可以进行“日日学”，“周周练”。可以进行多开，进行全面加速。
 
 ## 🍇 具体程序
-&emsp;&emsp;在这里，[AutomaticOnlineAnswerGUI.py](https://github.com/ExcaliburEX/AutomaticOnlineAnswer/blob/V1.0/AutomaticOnlineAnswerGUI.py)。
+&emsp;&emsp;在这里，[AutomaticOnlineAnswerGUI.py](https://github.com/ExcaliburEX/AutomaticOnlineAnswer/blob/master/AutomaticOnlineAnswerGUI.py)。
 
 主要运用了`selenium`来控制网页，用了`pySimpleGUI`制作了GUI。
 
