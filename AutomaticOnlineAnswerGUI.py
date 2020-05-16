@@ -9,9 +9,52 @@ import requests
 cookiesList = []
 log_url = 'https://bw.chinahrt.com.cn/#/login'
 url = 'https://bw.chinahrt.com.cn/#/'
-user = '18762856865'
-password = '189154'
+info_url = 'https://bw.chinahrt.com.cn/#/personal/learnStatistics'
+user = ''
+password = ''
 data = None
+login_flag = 0
+finish_flag = 0
+page = 0
+
+
+def FetchStatistics():
+    chrome_opts = webdriver.ChromeOptions()
+    chrome_opts.add_argument("--headless")
+    chrome_opts.add_experimental_option('excludeSwitches', ['enable-logging'])
+    driver = webdriver.Chrome(options=chrome_opts)
+    driver.get(url)
+    time.sleep(1)
+    for cookie in cookiesList:
+        driver.add_cookie(cookie)
+    time.sleep(1)
+    driver.refresh()
+    time.sleep(1)
+    driver.get(info_url)
+    time.sleep(1)
+    t1 = driver.find_element_by_xpath("//div[@class='module_title_g mb15 question_sum_top']/ul[@class='fr']/li[@class='li1']/p[2]").text
+    t2 = driver.find_element_by_xpath("//div[@class='module_title_g mb15 question_sum_top']/ul[@class='fr']/li[@class='li2']/p[2]").text
+    t3 = driver.find_element_by_xpath("//div[@class='module_title_g mb15 question_sum_top']/ul[@class='fr']/li[@class='li3']/p[2]").text
+    t4 = driver.find_element_by_xpath("//div[@class='module_title_g mb15 question_sum_top']/ul[@class='fr']/li[@class='li4']/p[2]").text
+
+    d1 = driver.find_element_by_xpath("//div[@class='module_title_g module_title_g2 mb15'][1]/ul[@class='fr']/li[@class='li1']/p").text
+    d2 = driver.find_element_by_xpath("//div[@class='module_title_g module_title_g2 mb15'][1]/ul[@class='fr']/li[@class='li2']/p").text
+    d3 = driver.find_element_by_xpath("//div[@class='module_title_g module_title_g2 mb15'][1]/ul[@class='fr']/li[@class='li3']/p").text
+    d4 = driver.find_element_by_xpath("//div[@class='module_title_g module_title_g2 mb15'][1]/ul[@class='fr']/li[@class='li4']/p").text
+    
+    z1 = driver.find_element_by_xpath("//div[@class='module_title_g module_title_g2 mb15'][2]/ul[@class='fr']/li[@class='li1']/p").text
+    z2 = driver.find_element_by_xpath("//div[@class='module_title_g module_title_g2 mb15'][2]/ul[@class='fr']/li[@class='li2']/p").text
+    z3 = driver.find_element_by_xpath("//div[@class='module_title_g module_title_g2 mb15'][2]/ul[@class='fr']/li[@class='li3']/p").text
+    z4 = driver.find_element_by_xpath("//div[@class='module_title_g module_title_g2 mb15'][2]/ul[@class='fr']/li[@class='li4']/p").text
+    
+    y1 = driver.find_element_by_xpath("//div[@class='module_title_g module_title_g2 mb15'][3]/ul[@class='fr']/li[@class='li1']/p").text
+    y2 = driver.find_element_by_xpath("//div[@class='module_title_g module_title_g2 mb15'][3]/ul[@class='fr']/li[@class='li2']/p").text
+    y3 = driver.find_element_by_xpath("//div[@class='module_title_g module_title_g2 mb15'][3]/ul[@class='fr']/li[@class='li3']/p").text
+    y4 = driver.find_element_by_xpath("//div[@class='module_title_g module_title_g2 mb15'][3]/ul[@class='fr']/li[@class='li4']/p").text
+    driver.quit()
+    return t1,t2,t3,t4,d1,d2,d3,d4,z1,z2,z3,z4,y1,y2,y3,y4
+
+
 
 def FetchQuestionData():
     global r
@@ -23,8 +66,8 @@ def FetchQuestionData():
 
 def open_browser(url):
     option = webdriver.ChromeOptions()
-    option.add_argument('log-level=3')
-    driver = webdriver.Chrome(chrome_options=option)
+    option.add_experimental_option('excludeSwitches', ['enable-logging'])
+    driver = webdriver.Chrome(options=option)
     driver.get(url)
     return driver
 
@@ -46,7 +89,10 @@ def login(user, password, url):
     driver.refresh()
     cookiesList = driver.get_cookies()
     time.sleep(1)
+    global login_flag
+    login_flag = 1
     driver.quit()
+    
 
 
 
@@ -330,6 +376,7 @@ def FindTorFAndFillTheBlank(question):
 
 
 def weekweekpractice():
+    global page
     driver = open_browser(url)
     for cookie in cookiesList:
         driver.add_cookie(cookie)
@@ -363,6 +410,9 @@ def weekweekpractice():
                 "//button[@class='el-button el-button--default el-button--small el-button--primary ']/span").click()
             time.sleep(1.5)
             driver.find_element_by_xpath("//a[@class='btn04_cui '][2]").click()
+            time.sleep(1)
+            global finish_flag
+            finish_flag = 1
             break
         if str(page) in already_done:
             page += 1
@@ -480,14 +530,14 @@ def weekweekpractice():
                     break
                 continue
             for c in ans:
-                time.sleep(0.5)
+                time.sleep(1)
                 if c == choiceA:
                     circleA.click()
                 elif c == choiceB:
                     circleB.click()
                 elif c == choiceC:
                     circleC.click()
-                else: 
+                elif c == choiceD: 
                     circleD.click()
         elif type_3 == '判断题':
             circleA = driver.find_element_by_xpath("//div[@class='fl']/dl[@class='mt20 fl mr40'][1]/dt")
@@ -543,10 +593,20 @@ def weekweekpractice():
                 except:
                     break
                 continue
+            if "。" in ans:
+                ans.replace("。","")
             if "；" in ans:
                 ansList = ans.split("；")
                 cnt = 0
                 for i in ansList:
+                    time.sleep(0.5)
+                    blank[cnt].send_keys(i)
+                    cnt += 1
+            elif "、" in ans:
+                ansList = ans.split("、")
+                cnt = 0
+                for i in ansList:
+                    time.sleep(0.5)
                     blank[cnt].send_keys(i)
                     cnt += 1
             else:
@@ -559,6 +619,65 @@ def weekweekpractice():
             break
 
 
+
+
+def UpdateData(window):
+    global login_flag
+    global finish_flag
+    while True:
+        if login_flag == 1:
+            t1,t2,t3,t4,d1,d2,d3,d4,z1,z2,z3,z4,y1,y2,y3,y4 = FetchStatistics()
+            window.FindElement("-T1-").update(t1)
+            window.FindElement("-T2-").update(t2)
+            window.FindElement("-T3-").update(t3)
+            window.FindElement("-T4-").update(t4)
+            
+            window.FindElement("-D1-").update(d1)
+            window.FindElement("-D2-").update(d2)
+            window.FindElement("-D3-").update(d3)
+            window.FindElement("-D4-").update(d4)
+            
+            window.FindElement("-Z1-").update(z1)
+            window.FindElement("-Z2-").update(z2)
+            window.FindElement("-Z3-").update(z3)
+            window.FindElement("-Z4-").update(z4)
+
+            window.FindElement("-Y1-").update(y1)
+            window.FindElement("-Y2-").update(y2)
+            window.FindElement("-Y3-").update(y3)
+            window.FindElement("-Y4-").update(y4)
+
+            login_flag = 0
+        
+        if finish_flag == 1:
+            
+            t1,t2,t3,t4,d1,d2,d3,d4,z1,z2,z3,z4,y1,y2,y3,y4 = FetchStatistics()
+            window.FindElement("-T1-").update(t1)
+            window.FindElement("-T2-").update(t2)
+            window.FindElement("-T3-").update(t3)
+            window.FindElement("-T4-").update(t4)
+            
+            window.FindElement("-D1-").update(d1)
+            window.FindElement("-D2-").update(d2)
+            window.FindElement("-D3-").update(d3)
+            window.FindElement("-D4-").update(d4)
+            
+            window.FindElement("-Z1-").update(z1)
+            window.FindElement("-Z2-").update(z2)
+            window.FindElement("-Z3-").update(z3)
+            window.FindElement("-Z4-").update(z4)
+
+            window.FindElement("-Y1-").update(y1)
+            window.FindElement("-Y2-").update(y2)
+            window.FindElement("-Y3-").update(y3)
+            window.FindElement("-Y4-").update(y4)
+            finish_flag = 0
+
+
+def UpdateQuesData(window):
+    global page
+    while True:
+        window.FindElement("-PROGRESS-").update(page-1)
 
 
 def GUI():
@@ -576,39 +695,56 @@ def GUI():
             [sg.Spin(values=('Spin Box 1', '2', '3'),
                         initial_value='Spin Box 2')],
             [sg.Spin(values=('Spin Box 1', '2', '3'), initial_value='Spin Box 3')]]
-
+    headings = ['正确率', '正确题数', '错误题数', '总题量']
     layout = [
-        # [sg.Menu(menu_def, tearoff=True)],
+        # [sg.Menu(menu_def, tearoff=True)], 
         [sg.Text('全国人社窗口单位业务技能练兵比武——冠军小霸王', size=(
             40, 1), justification='center', font=("Noto Serif SC", 25), relief=sg.RELIEF_RIDGE)],
         [sg.Text('请先登录，登陆时输入验证码，点击登录按钮，只需等待登录页面自动关闭后，再启动其他任务。', size=(
             77, 1), font=("Noto Serif SC", 12),text_color='blue')],
         [sg.Frame('登录选项', [[sg.Text('账号：'),
-                           sg.InputText('18912686679', size=(
+                           sg.InputText('', size=(
                                100, 1),key='-USER-')],
         [sg.Text('密码：'),
-        sg.InputText('189154', key='-PASSWORD-',size=(
+        sg.InputText('', key='-PASSWORD-',size=(
             100, 1))],
-            [sg.Button('登录', button_color=('white', 'green'), size=(95, 2))]], font=("Noto Serif SC", 25))],
+            [sg.Button('登录', button_color=('white', 'green'), size=(95, 1))]], font=("Noto Serif SC", 25))],
         [sg.Frame('日日学', [[sg.Button('习近平新时代中国特色社会主义思想、党的十九大精神', font=("Noto Serif SC", 12),button_color=(
-            'white', 'red'),size=(40, 2)),
-        sg.Button('就业创业', font=("Noto Serif SC", 12),button_color=('white', 'purple'),size=(40, 2))],
-        [sg.Button('社会保险', font=("Noto Serif SC", 12),button_color=('white', 'blue'),size=(40, 2)),
-        sg.Button('劳动关系', font=("Noto Serif SC", 12),button_color=('black', 'yellow'),size=(40, 2))],
-            [sg.Button('人事人才', font=("Noto Serif SC", 12), button_color=('white', 'orange'), size=(40, 2)),
+            'white', 'red'),size=(40, 1)),
+        sg.Button('就业创业', font=("Noto Serif SC", 12),button_color=('white', 'purple'),size=(40, 1))],
+        [sg.Button('社会保险', font=("Noto Serif SC", 12),button_color=('white', 'blue'),size=(40, 1)),
+        sg.Button('劳动关系', font=("Noto Serif SC", 12),button_color=('black', 'yellow'),size=(40, 1))],
+            [sg.Button('人事人才', font=("Noto Serif SC", 12), button_color=('white', 'orange'), size=(40, 1)),
              sg.Button('综合服务标准规范', font=("Noto Serif SC", 12), button_color=(
-            'white', 'black'), size=(40, 2))]], font=("Noto Serif SC", 25))],
+            'white', 'black'), size=(40, 1))]], font=("Noto Serif SC", 25))],
         [sg.Frame('周周练', [[sg.Button('启动周周练答题进程', font=("Noto Serif SC", 14), button_color=(
-            'yellow', 'purple'), size=(70, 2))]], font=("Noto Serif SC", 25))],
+            'yellow', 'purple'), size=(70, 1))]], font=("Noto Serif SC", 25))],
         [sg.Frame('月月比', [[sg.Button('启动月月比答题进程', font=("Noto Serif SC", 14), button_color=(
-            'white', 'green'), size=(70, 2))]], font=("Noto Serif SC", 25))],
-        [sg.Cancel('退出',font=("Consolas", 20), button_color=(
-            'white', 'red'), size=(58, 1))]]
+            'white', 'green'), size=(70, 1))]], font=("Noto Serif SC", 25))],
+        [sg.Text('当前周周练做题进度：'), sg.Text('无数据', size=(3, 1), text_color='pink', font=(
+            "Noto Serif SC", 15), relief=sg.RELIEF_RIDGE, key='-PROGRESS-', pad=(0, 0))],
+        [sg.Text('  ')] + [sg.Text(h, size=(18, 1), font=("Noto Serif SC", 10))
+                           for h in headings],
+        [sg.Frame(layout=[[sg.Text('无数据', size=(20, 1), text_color='blue', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-T1-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='blue', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-T2-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='blue', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-T3-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='blue', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-T4-', pad=(0, 0))]
+                          ], title='汇总情况', title_color='red', relief=sg.RELIEF_SUNKEN,font=("Noto Serif SC", 10), tooltip='Use these to set flags')],
+        [sg.Frame(layout=[[sg.Text('无数据', size=(20, 1), text_color='purple', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-D1-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='purple', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-D2-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='purple', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-D3-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='purple', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-D4-', pad=(0, 0))]
+                          ], title='日日学', title_color='red', relief=sg.RELIEF_SUNKEN, font=("Noto Serif SC", 10), tooltip='Use these to set flags')],
+        [sg.Frame(layout=[[sg.Text('无数据', size=(20, 1), text_color='green', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-Z1-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='green', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-Z2-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='green', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-Z3-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='green', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-Z4-', pad=(0, 0))]
+                          ], title='周周练', title_color='red', relief=sg.RELIEF_SUNKEN, font=("Noto Serif SC", 10), tooltip='Use these to set flags')],
+        [sg.Frame(layout=[[sg.Text('无数据', size=(20, 1), font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-Y1-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-Y2-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-Y3-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-Y4-', pad=(0, 0))]
+                          ], title='月月比', title_color='red', relief=sg.RELIEF_SUNKEN, font=("Noto Serif SC", 10), tooltip='Use these to set flags')],
+        [sg.Cancel('退出', font=("Noto Serif SC", 10), button_color=('white', 'red'), size=(5, 1))]]
 
     window = sg.Window('自动答题系统', layout,
                     default_element_size=(40, 1), grab_anywhere=False)
+    event, values = window.read()
+    T_data = threading.Thread(target=UpdateData,args=(window,))
+    T_data.start()
+    T_ques_data = threading.Thread(target=UpdateQuesData,args=(window,))
+    T_ques_data.start()
     while True:
         event, values = window.read()
+        
         if event == '退出':
             break
         if event == '登录':
