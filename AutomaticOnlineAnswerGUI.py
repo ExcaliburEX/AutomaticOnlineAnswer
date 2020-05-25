@@ -5,6 +5,9 @@ from selenium.webdriver.common.action_chains import ActionChains
 import random
 import threading
 import requests
+import base64
+import os
+
 
 cookiesList = []
 log_url = 'https://bw.chinahrt.com.cn/#/login'
@@ -16,6 +19,11 @@ data = None
 login_flag = 0
 finish_flag = 0
 page = 0
+img = b'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'
+log_driver = None
+ansnum = 0
+anscnt = 0
+
 
 
 def FetchStatistics():
@@ -120,13 +128,21 @@ def ModifyAnswer(driver):
             choice_dict[i.text] = i
         true_answer = driver.find_element_by_xpath(
             "//span[@class='f16  right_answer']/span[@class='answer_width']").text
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"查看解析，答案错误，由%s改为%s"%(err_choice.text,true_answer))
         choice_dict[true_answer].click()
 
 
 def ExclusiveChoice(driver):
+    global anscnt
+    global ansnum
     cnt = 0
     while True:
         try:
+            if anscnt >= ansnum:
+                print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"日日练指定%d题完成！"%(ansnum))
+                driver.quit()
+                break
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"日日练正在做第%d题！"%(anscnt+1))
             choice = driver.find_elements_by_xpath(
                 "//ul[@class='option_fl fl']/li/span[@class='circle_option fl']/a")
             random.choice(choice).click()
@@ -137,18 +153,28 @@ def ExclusiveChoice(driver):
             driver.find_element_by_xpath(
                 "//a[@class='btn04_cui ml20']").click()  # 下一页
             time.sleep(1.5)
+            anscnt += 1
         except:
-            print("单选题完成，一共%d道" % (cnt))
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                time.localtime()), "单选题完成，一共%d道" % (cnt))
             break
     return driver
 
 
 def MultipleChoice(driver):
+    global anscnt
+    global ansnum
     cnt = 0
     driver.find_element_by_xpath("//ul[@class='w1200 m0 oh']/li[2]").click()
     time.sleep(2)
     while True:
         try:
+            if anscnt >= ansnum:
+                print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"日日练指定%d题完成！"%(ansnum))
+                driver.quit()
+                break
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
             # choice_num = random.randint(2, 4)
             choice = driver.find_elements_by_xpath(
                 "//ul[@class='option_fl  fl']/li/a/span[@class='circle_option fl']")
@@ -175,19 +201,30 @@ def MultipleChoice(driver):
             driver.find_element_by_xpath(
                 "//a[@class='btn04_cui ml20']").click()  # 下一页
             time.sleep(1.5)
+            anscnt += 1
         except:
-            print("多选题完成，一共%d道" % (cnt))
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                time.localtime()), "多选题完成，一共%d道" % (cnt))
             break
 
     return driver
 
 
 def TorF(driver):
+    global anscnt 
+    global ansnum
     cnt = 0
     driver.find_element_by_xpath("//ul[@class='w1200 m0 oh']/li[3]").click()
     time.sleep(2)
     while True:
         try:
+            if anscnt >= ansnum:
+                print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                    time.localtime()), "日日练指定%d题完成！" % (ansnum))
+                driver.quit()
+                break
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
             choiceTorF = driver.find_elements_by_xpath(
                 "//ul[@class = 'option_fl fl']/li/a/span[@class = 'circle_option fl']")
             random.choice(choiceTorF).click()
@@ -203,18 +240,29 @@ def TorF(driver):
             driver.find_element_by_xpath(
                 "//a[@class='btn04_cui ml20']").click()  # 下一页
             time.sleep(1.5)
+            anscnt += 1
         except:
-            print("判断题完成，一共%d道" % (cnt))
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                time.localtime()), "判断题完成，一共%d道" % (cnt))
             break
     return driver
 
 
 def FillTheBlank(driver):
+    global anscnt
+    global ansnum
     cnt = 0
     driver.find_element_by_xpath("//ul[@class='w1200 m0 oh']/li[4]").click()
     time.sleep(2)
     while True:
         try:
+            if anscnt >= ansnum:
+                print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                    time.localtime()), "日日练指定%d题完成！" % (ansnum))
+                driver.quit()
+                break
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
             Blank = driver.find_elements_by_class_name('input_txt')
             # Blank = driver.find_element_by_xpath(
             #     "//span/input[@class= 'input_txt']")
@@ -235,18 +283,29 @@ def FillTheBlank(driver):
             driver.find_element_by_xpath(
                 "//a[@class='btn04_cui ml20']").click()  # 下一页
             time.sleep(1.5)
+            anscnt += 1
         except:
-            print("填空题完成，一共%d道" % (cnt))
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                time.localtime()), "填空题完成，一共%d道" % (cnt))
             break
     return driver
 
 
 def ShortAnswerQuestions(driver):
+    global anscnt
+    global ansnum
     cnt = 0
     driver.find_element_by_xpath("//ul[@class='w1200 m0 oh']/li[5]").click()
     time.sleep(2)
     while True:
         try:
+            if anscnt >= ansnum:
+                print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                    time.localtime()), "日日练指定%d题完成！" % (ansnum))
+                driver.quit()
+                break
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
             Blank = driver.find_element_by_xpath(
                 "//textarea[@class='mt15 answer_area m0']")
             driver.find_element_by_xpath(
@@ -259,13 +318,17 @@ def ShortAnswerQuestions(driver):
             driver.find_element_by_xpath(
                 "//a[@class='btn04_cui ml20']").click()  # 下一页
             time.sleep(1.5)
+            anscnt += 1
         except:
-            print("简答题完成，一共%d道" % (cnt))
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                time.localtime()), "简答题完成，一共%d道" % (cnt))
             break
     return driver
 
 
 def CaseQuestions(driver):
+    global anscnt
+    global ansnum
     cnt = 0
     try:
         driver.find_element_by_xpath(
@@ -273,6 +336,13 @@ def CaseQuestions(driver):
         time.sleep(2)
         while True:
             try:
+                if anscnt >= ansnum:
+                    print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                        time.localtime()), "日日练指定%d题完成！" % (ansnum))
+                    driver.quit()
+                    break
+                print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                    time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
                 Blank = driver.find_element_by_xpath(
                     "//textarea[@class='mt15 answer_area m0']")
                 driver.find_element_by_xpath(
@@ -285,38 +355,46 @@ def CaseQuestions(driver):
                 driver.find_element_by_xpath(
                     "//a[@class='btn04_cui ml20']").click()  # 下一页
                 time.sleep(1.5)
+                anscnt += 1
             except:
-                print("案例题完成，一共%d道" % (cnt))
+                print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                    time.localtime()), "案例题完成，一共%d道" % (cnt))
                 break
     except:
-        print("没有案例题！")
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                            time.localtime()), "没有案例题！")
     return driver
 
 
 
 def daydaylearn(num):
-    driver = open_browser(url)
-    for cookie in cookiesList:
-        driver.add_cookie(cookie)
-    time.sleep(1)
-    driver.refresh()
-    time.sleep(1)
-    driver.find_element_by_xpath(
-        "//div[@class='he_exam_studying']/ul/li[1]").click()  # 日日学
-    time.sleep(1)
-    driver.find_element_by_xpath(
-        "//a[@class='btn01_cui cursor mt100']").click()  # 开始答题
-    time.sleep(1)
-    driver.find_element_by_xpath(
-        "//p[@class='cursor'][%s]" % (num)).click()
-    driver.switch_to.window(driver.window_handles[-1])  # 切换到新窗口
-    time.sleep(1.5)
-    driver = ExclusiveChoice(driver)  # 单选
-    driver = MultipleChoice(driver)  # 多选
-    driver = TorF(driver)  # 判断
-    driver = FillTheBlank(driver)
-    driver = ShortAnswerQuestions(driver)
-    driver = CaseQuestions(driver)
+    print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"开始日日学！")
+    try:
+        driver = open_browser(url)
+        for cookie in cookiesList:
+            driver.add_cookie(cookie)
+        time.sleep(1)
+        driver.refresh()
+        time.sleep(1)
+        driver.find_element_by_xpath(
+            "//div[@class='he_exam_studying']/ul/li[1]").click()  # 日日学
+        time.sleep(1)
+        driver.find_element_by_xpath(
+            "//a[@class='btn01_cui cursor mt100']").click()  # 开始答题
+        time.sleep(1)
+        driver.find_element_by_xpath(
+            "//p[@class='cursor'][%s]" % (num)).click()
+        driver.switch_to.window(driver.window_handles[-1])  # 切换到新窗口
+        time.sleep(1.5)
+        driver = ExclusiveChoice(driver)  # 单选
+        driver = MultipleChoice(driver)  # 多选
+        driver = TorF(driver)  # 判断
+        driver = FillTheBlank(driver)
+        driver = ShortAnswerQuestions(driver)
+        driver = CaseQuestions(driver)
+        driver.quit()
+    except:
+        pass
 
 
 def FindExclusiveAnswer(question):
@@ -376,6 +454,7 @@ def FindTorFAndFillTheBlank(question):
 
 
 def weekweekpractice():
+    print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"开始周周练进程！")
     global page
     driver = open_browser(url)
     for cookie in cookiesList:
@@ -402,7 +481,8 @@ def weekweekpractice():
     while True:
         time.sleep(0.5)
         if page == (total_questions) + 1:
-            print("做完了")
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                time.localtime()), "做完了")
             driver.find_element_by_xpath(
                 "//button[@class='el-button btn02_cui el-button--default el-button--small']/span").click()
             time.sleep(1.5)
@@ -416,11 +496,13 @@ def weekweekpractice():
             break
         if str(page) in already_done:
             page += 1
-            print("做过了！")
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                time.localtime()), "第%d题做过了！"%(page))
             driver.find_element_by_xpath(
                 "//a[@class='btn04_cui ml20']").click()  # 下一页
             continue
         page += 1
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"正在做周周练第%d题"%(page-1))
         try:
             type_1 = driver.find_element_by_xpath(
                 "//h1[@class='exam_title_cui bg_white pl15 f18'][1]").text[0:3]
@@ -458,7 +540,8 @@ def weekweekpractice():
             try:
                 ans = FindExclusiveAnswer(question)
             except:
-                print("找不到答案！")
+                print(time.strftime(
+                    "[%Y-%m-%d %H:%M:%S] ", time.localtime()), "找不到答案！")
                 random.choice([circleA,circleB,circleC,circleD]).click()
                 time.sleep(1)
                 try:
@@ -468,7 +551,8 @@ def weekweekpractice():
                     break
                 continue
             if ans == ' ':
-                print("第%d题找不到答案！"%(page-1))
+                print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                    time.localtime()), "第%d题找不到答案！" % (page-1))
                 random.choice([circleA, circleB, circleC, circleD]).click()
                 time.sleep(1)
                 try:
@@ -498,7 +582,8 @@ def weekweekpractice():
             try:
                 ans = FindMutipleAnswer(question)
             except:
-                print("找不到答案！")
+                print(time.strftime(
+                    "[%Y-%m-%d %H:%M:%S] ", time.localtime()), "找不到答案！")
                 circleA.click()
                 time.sleep(0.5)
                 circleB.click()
@@ -514,7 +599,8 @@ def weekweekpractice():
                     break
                 continue
             if ans == []:
-                print("第%d题找不到答案！" % (page-1))
+                print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                    time.localtime()), "第%d题找不到答案！" % (page-1))
                 circleA.click()
                 time.sleep(0.5)
                 circleB.click()
@@ -549,7 +635,8 @@ def weekweekpractice():
             try:
                 ans = FindTorFAndFillTheBlank(question)
             except:
-                print("找不到答案！")
+                print(time.strftime(
+                    "[%Y-%m-%d %H:%M:%S] ", time.localtime()), "找不到答案！")
                 circleA.click()
                 try:
                     driver.find_element_by_xpath(
@@ -558,7 +645,8 @@ def weekweekpractice():
                     break
                 continue
             if ans == None:
-                print("第%d题找不到答案！" % (page-1))
+                print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                    time.localtime()), "第%d题找不到答案！" % (page-1))
                 circleA.click()
                 try:
                     driver.find_element_by_xpath(
@@ -576,8 +664,9 @@ def weekweekpractice():
             try:
                 ans = FindTorFAndFillTheBlank(question)
             except:
-                print("找不到答案！")
-                blank[0].send_keys('666666')
+                print(time.strftime(
+                    "[%Y-%m-%d %H:%M:%S] ", time.localtime()), "找不到答案！")
+                blank[0].send_keys(' ')
                 try:
                     driver.find_element_by_xpath(
                         "//a[@class='btn04_cui ml20']").click()  # 下一页
@@ -585,8 +674,9 @@ def weekweekpractice():
                     break
                 continue
             if ans == None:
-                print("第%d题找不到答案！" % (page-1))
-                blank[0].send_keys('666666')
+                print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                                    time.localtime()), "第%d题找不到答案！" % (page-1))
+                blank[0].send_keys(' ')
                 try:
                     driver.find_element_by_xpath(
                         "//a[@class='btn04_cui ml20']").click()  # 下一页
@@ -619,13 +709,19 @@ def weekweekpractice():
             break
 
 
+# def monthmonthcompete():
+    
+
+
 
 
 def UpdateData(window):
     global login_flag
     global finish_flag
     while True:
+        time.sleep(1)
         if login_flag == 1:
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"正在获取历史答题数据...")
             t1,t2,t3,t4,d1,d2,d3,d4,z1,z2,z3,z4,y1,y2,y3,y4 = FetchStatistics()
             window.FindElement("-T1-").update(t1)
             window.FindElement("-T2-").update(t2)
@@ -646,11 +742,12 @@ def UpdateData(window):
             window.FindElement("-Y2-").update(y2)
             window.FindElement("-Y3-").update(y3)
             window.FindElement("-Y4-").update(y4)
-
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"数据刷新成功！")
             login_flag = 0
         
         if finish_flag == 1:
             
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"正在获取历史答题数据...")
             t1,t2,t3,t4,d1,d2,d3,d4,z1,z2,z3,z4,y1,y2,y3,y4 = FetchStatistics()
             window.FindElement("-T1-").update(t1)
             window.FindElement("-T2-").update(t2)
@@ -671,13 +768,87 @@ def UpdateData(window):
             window.FindElement("-Y2-").update(y2)
             window.FindElement("-Y3-").update(y3)
             window.FindElement("-Y4-").update(y4)
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"数据刷新成功！")
             finish_flag = 0
 
 
 def UpdateQuesData(window):
     global page
     while True:
+        time.sleep(1)
         window.FindElement("-PROGRESS-").update(page-1)
+
+
+def transparent_back(img):
+    img = img.convert('RGBA')
+    L, H = img.size
+    color_0 = (255, 255, 255, 255)  # 要替换的颜色
+    for h in range(H):
+        for l in range(L):
+            dot = (l, h)
+            color_1 = img.getpixel(dot)
+            if color_1 == color_0:
+                color_1 = color_1[:-1] + (0,)
+                img.putpixel(dot, color_1)
+    return img
+
+def get_verification_cd(user, password, url,window):
+    print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"正在获取验证码...")
+    global log_driver
+    chrome_opts = webdriver.ChromeOptions()
+    chrome_opts.add_argument("--headless")
+    chrome_opts.add_experimental_option('excludeSwitches', ['enable-logging'])
+    driver = webdriver.Chrome(options=chrome_opts)
+    driver.get(url)
+    driver.set_window_size(width=800, height=800, windowHandle="current")
+    driver.find_elements_by_class_name('el-input__inner')[0].clear()
+    driver.find_elements_by_class_name(
+        'el-input__inner')[0].send_keys(user)
+    driver.find_elements_by_class_name('el-input__inner')[1].clear()
+    driver.find_elements_by_class_name(
+        'el-input__inner')[1].send_keys(password)
+    # kaptcha_url = driver.find_element_by_id('safecode').get_attribute('src')
+    # r = requests.get(kaptcha_url)
+    # with open('img.jpg', 'wb') as f:
+    #     f.write(r.content)
+    # f.close()
+    kaptcha = driver.find_element_by_id('safecode')
+    kaptcha.screenshot('img.png')
+    # img = Image.open('img.jpg')
+    # img = transparent_back(img)
+    # img.save('imgcode.png')
+    with open('img.png', 'rb') as f:
+        image = f.read() 
+    f.close()
+    os.remove('img.png')
+    # os.remove('imgcode.png')
+    base64_data = base64.b64encode(image)
+    imgNew = base64_data.decode('utf-8')
+    imgNew = bytes(imgNew, encoding="utf8")
+    window['safecode'].update(data=imgNew)
+    print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()), "获取验证码成功！")
+    log_driver = driver
+
+
+def new_login(input_kapcatch):
+    global log_driver
+    global cookiesList
+    log_driver.find_elements_by_xpath(
+        "//input[@class='el-input__inner']")[2].send_keys(input_kapcatch)
+    log_driver.find_element_by_xpath("//input[@class='logbtn mt40 cursor']").click()
+    time.sleep(1)
+    if log_driver.find_elements_by_class_name('el-input__inner') == []:
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()), "登录成功！")
+        log_driver.refresh()
+        cookiesList = log_driver.get_cookies()
+        time.sleep(1)
+        global login_flag
+        login_flag = 1
+        log_driver.quit()
+    else:
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                            time.localtime()), "登录失败，请重新获取验证码！")
+
 
 
 def GUI():
@@ -689,6 +860,7 @@ def GUI():
     #             ['&Help', '&About...'], ]
 
     # ------ Column Definition ------ #
+    sg.theme('Reddit')
     column1 = [[sg.Text('Column 1', background_color='lightblue', justification='center', size=(10, 1))],
             [sg.Spin(values=('Spin Box 1', '2', '3'),
                         initial_value='Spin Box 1')],
@@ -699,85 +871,93 @@ def GUI():
     layout = [
         # [sg.Menu(menu_def, tearoff=True)], 
         [sg.Text('全国人社窗口单位业务技能练兵比武——冠军小霸王', size=(
-            40, 1), justification='center', font=("Noto Serif SC", 25), relief=sg.RELIEF_RIDGE)],
-        [sg.Text('请先登录，登陆时输入验证码，点击登录按钮，只需等待登录页面自动关闭后，再启动其他任务。', size=(
-            77, 1), font=("Noto Serif SC", 12),text_color='blue')],
+            40, 1), justification='center', font=("Noto Serif SC", 18), relief=sg.RELIEF_RIDGE)],
+        [sg.Text('请先获取验证码，进行登录，随后再进行各项进程，可多开。', size=(
+            70, 1), font=("Noto Serif SC", 10),text_color='blue')],
         [sg.Frame('登录选项', [[sg.Text('账号：'),
                            sg.InputText('', size=(
-                               100, 1),key='-USER-')],
+                               80, 1),key='-USER-')],
         [sg.Text('密码：'),
         sg.InputText('', key='-PASSWORD-',size=(
-            100, 1))],
-            [sg.Button('登录', button_color=('white', 'green'), size=(95, 1))]], font=("Noto Serif SC", 25))],
-        [sg.Frame('日日学', [[sg.Button('习近平新时代中国特色社会主义思想、党的十九大精神', font=("Noto Serif SC", 12),button_color=(
-            'white', 'red'),size=(40, 1)),
-        sg.Button('就业创业', font=("Noto Serif SC", 12),button_color=('white', 'purple'),size=(40, 1))],
-        [sg.Button('社会保险', font=("Noto Serif SC", 12),button_color=('white', 'blue'),size=(40, 1)),
-        sg.Button('劳动关系', font=("Noto Serif SC", 12),button_color=('black', 'yellow'),size=(40, 1))],
-            [sg.Button('人事人才', font=("Noto Serif SC", 12), button_color=('white', 'orange'), size=(40, 1)),
+            80, 1))], [sg.Frame('验证码', [[sg.Image(data=img,key='safecode'), sg.Button('获取验证码',key='GETCODE'), sg.InputText('',key='CODEBLANK')]]), 
+                       sg.Button('登录', button_color=('white', 'green'), size=(8, 4))]], font=("Noto Serif SC", 25), title_color='Tomato')],
+        [sg.Frame('日日学', [[sg.Text('设置学习题数：'),sg.InputText('30',key='ANSNUM')],[sg.Button('习中特、党十九大精神', font=("Noto Serif SC", 12),button_color=(
+            'white', 'red'),size=(30, 1)),
+        sg.Button('就业创业', font=("Noto Serif SC", 12),button_color=('white', 'purple'),size=(30, 1))],
+        [sg.Button('社会保险', font=("Noto Serif SC", 12),button_color=('white', 'blue'),size=(30, 1)),
+        sg.Button('劳动关系', font=("Noto Serif SC", 12),button_color=('black', 'yellow'),size=(30, 1))],
+            [sg.Button('人事人才', font=("Noto Serif SC", 12), button_color=('white', 'orange'), size=(30, 1)),
              sg.Button('综合服务标准规范', font=("Noto Serif SC", 12), button_color=(
-            'white', 'black'), size=(40, 1))]], font=("Noto Serif SC", 25))],
+            'white', 'black'), size=(30, 1))]], font=("Noto Serif SC", 25))],
         [sg.Frame('周周练', [[sg.Button('启动周周练答题进程', font=("Noto Serif SC", 14), button_color=(
-            'yellow', 'purple'), size=(70, 1))]], font=("Noto Serif SC", 25))],
+            'yellow', 'purple'), size=(51, 1))]], font=("Noto Serif SC", 25))],
         [sg.Frame('月月比', [[sg.Button('启动月月比答题进程', font=("Noto Serif SC", 14), button_color=(
-            'white', 'green'), size=(70, 1))]], font=("Noto Serif SC", 25))],
+            'white', 'green'), size=(51, 1))]], font=("Noto Serif SC", 25))],
         [sg.Text('当前周周练做题进度：'), sg.Text('无数据', size=(3, 1), text_color='pink', font=(
             "Noto Serif SC", 15), relief=sg.RELIEF_RIDGE, key='-PROGRESS-', pad=(0, 0))],
-        [sg.Text('  ')] + [sg.Text(h, size=(18, 1), font=("Noto Serif SC", 10))
+        [sg.Text('  ')] + [sg.Text(h, size=(6, 1), font=("Noto Serif SC", 10))
                            for h in headings],
-        [sg.Frame(layout=[[sg.Text('无数据', size=(20, 1), text_color='blue', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-T1-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='blue', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-T2-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='blue', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-T3-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='blue', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-T4-', pad=(0, 0))]
-                          ], title='汇总情况', title_color='red', relief=sg.RELIEF_SUNKEN,font=("Noto Serif SC", 10), tooltip='Use these to set flags')],
-        [sg.Frame(layout=[[sg.Text('无数据', size=(20, 1), text_color='purple', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-D1-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='purple', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-D2-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='purple', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-D3-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='purple', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-D4-', pad=(0, 0))]
-                          ], title='日日学', title_color='red', relief=sg.RELIEF_SUNKEN, font=("Noto Serif SC", 10), tooltip='Use these to set flags')],
-        [sg.Frame(layout=[[sg.Text('无数据', size=(20, 1), text_color='green', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-Z1-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='green', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-Z2-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='green', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-Z3-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), text_color='green', font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-Z4-', pad=(0, 0))]
-                          ], title='周周练', title_color='red', relief=sg.RELIEF_SUNKEN, font=("Noto Serif SC", 10), tooltip='Use these to set flags')],
-        [sg.Frame(layout=[[sg.Text('无数据', size=(20, 1), font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-Y1-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-Y2-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-Y3-', pad=(0, 0)), sg.Text('无数据', size=(20, 1), font=("Noto Serif SC", 10), relief=sg.RELIEF_RIDGE, key='-Y4-', pad=(0, 0))]
-                          ], title='月月比', title_color='red', relief=sg.RELIEF_SUNKEN, font=("Noto Serif SC", 10), tooltip='Use these to set flags')],
+        [sg.Frame('数据展示',[[sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), text_color='blue', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-T1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-T2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-T3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-T4-', pad=(0, 0))]
+                          ], title='汇总情况', title_color='red', relief=sg.RELIEF_SUNKEN,font=("Noto Serif SC", 8), tooltip='Use these to set flags')],
+        [sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), text_color='purple', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-D1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='purple', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-D2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='purple', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-D3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='purple', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-D4-', pad=(0, 0))]
+                          ], title='日日学', title_color='red', relief=sg.RELIEF_SUNKEN, font=("Noto Serif SC", 8), tooltip='Use these to set flags')],
+        [sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), text_color='green', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-Z1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='green', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-Z2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='green', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-Z3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='green', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-Z4-', pad=(0, 0))]
+                          ], title='周周练', title_color='red', relief=sg.RELIEF_SUNKEN, font=("Noto Serif SC", 8), tooltip='Use these to set flags')],
+        [sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-Y1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-Y2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-Y3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-Y4-', pad=(0, 0))]
+                          ], title='月月比', title_color='red', relief=sg.RELIEF_SUNKEN, font=("Noto Serif SC", 10), tooltip='Use these to set flags')]]), sg.Output(size=(50, 10))],
         [sg.Cancel('退出', font=("Noto Serif SC", 10), button_color=('white', 'red'), size=(5, 1))]]
 
     window = sg.Window('自动答题系统', layout,
-                    default_element_size=(40, 1), grab_anywhere=False)
-    event, values = window.read()
+                       default_element_size=(40, 1), grab_anywhere=True, resizable=True, text_justification='center')
+
     T_data = threading.Thread(target=UpdateData,args=(window,))
     T_data.start()
     T_ques_data = threading.Thread(target=UpdateQuesData,args=(window,))
     T_ques_data.start()
+    global ansnum
     while True:
         event, values = window.read()
-        
-        if event == '退出':
-            break
+        ansnum = int(values['ANSNUM'])
         if event == '登录':
-            t1 = threading.Thread(
-                target=login, args=(str(values['-USER-']), str(values['-PASSWORD-']), log_url))
+            # t1 = threading.Thread(target=login, args=(str(values['-USER-']), str(values['-PASSWORD-']), log_url))
+            input_kapcatch = values['CODEBLANK']
+            t1 = threading.Thread(target=new_login,args=(input_kapcatch,))
             t1.start()
-        if event == '习近平新时代中国特色社会主义思想、党的十九大精神':
+        elif event == '习中特、党十九大精神':
             t2 = threading.Thread(
                 target=daydaylearn, args=(1, ))
             t2.start()
-        if event == '就业创业':
+        elif event == '就业创业':
             t3 = threading.Thread(
                 target=daydaylearn, args=(2, ))
             t3.start()
-        if event == '社会保险':
+        elif event == '社会保险':
             t4 = threading.Thread(
                 target=daydaylearn, args=(3, ))
             t4.start()
-        if event == '劳动关系':
+        elif event == '劳动关系':
             t5 = threading.Thread(
                 target=daydaylearn, args=(4, ))
             t5.start()
-        if event == '人事人才':
+        elif event == '人事人才':
             t6 = threading.Thread(
                 target=daydaylearn, args=(5, ))
             t6.start()
-        if event == '综合服务标准规范':
+        elif event == '综合服务标准规范':
             t6 = threading.Thread(
                 target=daydaylearn, args=(6, ))
             t6.start()
-        if event == '启动周周练答题进程':
+        elif event == '启动周周练答题进程':
             t7 = threading.Thread(target=weekweekpractice)
             t7.start()
+        elif event == '启动月月比答题进程':
+            t8 = threading.Thread(target=monthmonthcompete)
+            t8.start()
+        elif event == 'GETCODE':
+            t9 = threading.Thread(target=get_verification_cd, args=(str(values['-USER-']), str(values['-PASSWORD-']), log_url,window))
+            t9.start()
+        else:
+            break
         # sg.Popup('Title',
         #         'The results of the window.',
         #         'The button clicked was "{}"'.format(event),

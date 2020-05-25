@@ -9,8 +9,8 @@
 
 [![HitCount](http://hits.dwyl.com/ExcaliburEX/AutomaticOnlineAnswer.svg)](http://hits.dwyl.com/ExcaliburEX/AutomaticOnlineAnswer)
 [![Build Status](https://www.travis-ci.org/ExcaliburEX/AutomaticOnlineAnswer.svg?branch=master)](https://www.travis-ci.org/ExcaliburEX/AutomaticOnlineAnswer)
-[![GitHub Issues](https://img.shields.io/github/issues/ExcaliburEX/GHS.svg)](https://github.com/ExcaliburEX/AutomaticOnlineAnswer)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/ExcaliburEX/GHS.svg)](https://github.com/ExcaliburEX/AutomaticOnlineAnswer/pulls)
+[![GitHub Issues](https://img.shields.io/github/issues/ExcaliburEX/AutomaticOnlineAnswer.svg)](https://github.com/ExcaliburEX/AutomaticOnlineAnswer)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/ExcaliburEX/AutomaticOnlineAnswer.svg)](https://github.com/ExcaliburEX/AutomaticOnlineAnswer/pulls)
 ![forks](https://img.shields.io/github/forks/ExcaliburEX/AutomaticOnlineAnswer)
 ![stars](	https://img.shields.io/github/stars/ExcaliburEX/AutomaticOnlineAnswer)
 ![repo size](https://img.shields.io/github/repo-size/ExcaliburEX/AutomaticOnlineAnswer)
@@ -27,7 +27,7 @@
 ## 🍌 下载最新release
 &emsp;&emsp;下载[release](https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases)启动即可，以下是运行界面：
 
-![](https://blog-1259799643.cos.ap-shanghai.myqcloud.com/2020-05-17-%E6%88%AA%E5%9B%BE2.jpg)
+![](https://blog-1259799643.cos.ap-shanghai.myqcloud.com/2020-05-26-%E7%B3%BB%E7%BB%9F%E5%9B%BE.gif)
 
 ## 🍓 运行Tips
 &emsp;&emsp;每次运行需先点击登录按钮，在自动打开的网页中输入验证码点击页面的“登录”即可，浏览器会自动关闭。后面就可以进行“日日学”，“周周练”。可以进行多开，进行全面加速。
