@@ -465,15 +465,32 @@ def weekweekpractice():
     driver.find_element_by_xpath(
         "//div[@class='he_exam_studying']/ul/li[2]").click()  # 周周练
     time.sleep(2)
+    button_flag = 0
     try:
-        driver.find_element_by_xpath(
-            "//a[@class=' cb btn03_cui cursor Clearfix  m0 ']").click()  # 再来一套
+        driver.find_element_by_xpath("//a[@class='cb btn03_cui cursor Clearfix m0']").click()  # 再来一套
+        button_flag = 1
     except:
+        pass
+    if button_flag == 0:
         try:
             driver.find_element_by_xpath("//a[@class='btn02_cui cursor']").click()  # 继续答题
+            button_flag = 1
         except:
+            pass
+    if button_flag == 0:
+        try:
             driver.find_element_by_xpath("//a[@class='btn01_cui cursor']").click() # 开始答题
-    time.sleep(1.5)
+            button_flag = 1
+        except:
+            pass
+    if button_flag == 0:
+        try:
+            driver.find_element_by_xpath("//a[@class=' cb btn03_cui cursor Clearfix  m0 ']").click()
+        except:
+            pass
+
+    time.sleep(4)
+
     already_done = [x.text for x in driver.find_elements_by_xpath("//a[@class='tc tip']")]
     not_done = [x.text for x in driver.find_elements_by_xpath("//a[@class='tc']")]
     total_questions = len(already_done) + len(not_done)
