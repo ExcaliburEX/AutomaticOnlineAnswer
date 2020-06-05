@@ -128,7 +128,7 @@ def ModifyAnswer(driver):
             choice_dict[i.text] = i
         true_answer = driver.find_element_by_xpath(
             "//span[@class='f16  right_answer']/span[@class='answer_width']").text
-        print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"查看解析，答案错误，由%s改为%s"%(err_choice.text,true_answer))
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"查看解析，答案错误，由%s改为%s"%(str(error_choice.text),str(true_answer)))
         choice_dict[true_answer].click()
 
 
@@ -136,6 +136,16 @@ def ExclusiveChoice(driver):
     global anscnt
     global ansnum
     cnt = 0
+    try:
+        restart_button = driver.find_element_by_xpath("//a[@class='btn04_cui ml20']")
+        if restart_button.text == '重新开始':
+            restart_button.click()
+            time.sleep(1)
+            driver.find_element_by_xpath(
+                "//button[@class = 'el-button el-button--default el-button--small el-button--primary ']").click()
+            time.sleep(1)
+    except:
+        pass
     while True:
         try:
             if anscnt >= ansnum:
@@ -167,6 +177,16 @@ def MultipleChoice(driver):
     cnt = 0
     driver.find_element_by_xpath("//ul[@class='w1200 m0 oh']/li[2]").click()
     time.sleep(2)
+    try:
+        restart_button = driver.find_element_by_xpath(
+            "//a[@class='btn04_cui ml20']")
+        if restart_button.text == '重新开始':
+            restart_button.click()
+            time.sleep(1)
+            driver.find_element_by_xpath("//button[@class = 'el-button el-button--default el-button--small el-button--primary ']").click()
+            time.sleep(1)
+    except:
+        pass
     while True:
         try:
             if anscnt >= ansnum:
@@ -194,8 +214,12 @@ def MultipleChoice(driver):
                     choice[1].click()
                 elif c == 'C':
                     choice[2].click()
-                else:
+                elif c == 'D':
                     choice[3].click()
+                else:
+                    choice[4].click()
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),
+                  "查看解析:"," ".join(str(i) for i in true_choice))
             cnt += 1
             time.sleep(1)
             driver.find_element_by_xpath(
@@ -216,6 +240,24 @@ def TorF(driver):
     cnt = 0
     driver.find_element_by_xpath("//ul[@class='w1200 m0 oh']/li[3]").click()
     time.sleep(2)
+    try:
+        restart_button = driver.find_element_by_xpath(
+            "//a[@class='btn04_cui ml20']")
+        if restart_button.text == '重新开始':
+            restart_button.click()
+            time.sleep(1)
+            driver.find_element_by_xpath("//button[@class = 'el-button el-button--default el-button--small el-button--primary ']").click()
+            time.sleep(1)
+    except:
+        pass
+    try:
+        restart_button = driver.find_element_by_xpath(
+            "//a[@class='btn04_cui ml20']")
+        if restart_button.text == '重新开始':
+            restart_button.click()
+            sp(1)
+    except:
+        pass
     while True:
         try:
             if anscnt >= ansnum:
@@ -254,6 +296,16 @@ def FillTheBlank(driver):
     cnt = 0
     driver.find_element_by_xpath("//ul[@class='w1200 m0 oh']/li[4]").click()
     time.sleep(2)
+    try:
+        restart_button = driver.find_element_by_xpath(
+            "//a[@class='btn04_cui ml20']")
+        if restart_button.text == '重新开始':
+            restart_button.click()
+            time.sleep(1)
+            driver.find_element_by_xpath("//button[@class = 'el-button el-button--default el-button--small el-button--primary ']").click()
+            time.sleep(1)
+    except:
+        pass
     while True:
         try:
             if anscnt >= ansnum:
@@ -297,6 +349,16 @@ def ShortAnswerQuestions(driver):
     cnt = 0
     driver.find_element_by_xpath("//ul[@class='w1200 m0 oh']/li[5]").click()
     time.sleep(2)
+    try:
+        restart_button = driver.find_element_by_xpath(
+            "//a[@class='btn04_cui ml20']")
+        if restart_button.text == '重新开始':
+            restart_button.click()
+            time.sleep(1)
+            driver.find_element_by_xpath("//button[@class = 'el-button el-button--default el-button--small el-button--primary ']").click()
+            time.sleep(1)
+    except:
+        pass
     while True:
         try:
             if anscnt >= ansnum:
@@ -334,6 +396,15 @@ def CaseQuestions(driver):
         driver.find_element_by_xpath(
             "//ul[@class='w1200 m0 oh']/li[6]").click()
         time.sleep(2)
+        try:
+            restart_button = driver.find_element_by_xpath("//a[@class='btn04_cui ml20']")
+            if restart_button.text == '重新开始':
+                restart_button.click()
+                time.sleep(1)
+                driver.find_element_by_xpath("//button[@class = 'el-button el-button--default el-button--small el-button--primary ']").click()
+                time.sleep(1)
+        except:
+            pass
         while True:
             try:
                 if anscnt >= ansnum:
@@ -968,8 +1039,9 @@ def GUI():
             t7 = threading.Thread(target=weekweekpractice)
             t7.start()
         elif event == '启动月月比答题进程':
-            t8 = threading.Thread(target=monthmonthcompete)
-            t8.start()
+            # t8 = threading.Thread(target=monthmonthcompete)
+            # t8.start()
+            pass
         elif event == 'GETCODE':
             t9 = threading.Thread(target=get_verification_cd, args=(str(values['-USER-']), str(values['-PASSWORD-']), log_url,window))
             t9.start()
