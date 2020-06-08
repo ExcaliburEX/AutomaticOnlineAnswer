@@ -67,10 +67,18 @@ def FetchStatistics():
 def FetchQuestionData():
     global r
     r = requests.get(
-        'https://blog-1259799643.cos.ap-shanghai.myqcloud.com/2020-05-15-%E9%A2%98%E5%BA%93.txt')
+        'https://blog-1259799643.cos.ap-shanghai.myqcloud.com/2020-06-08-%E9%A2%98%E5%BA%93.txt')
     r.encoding = 'gbk'
     global data
     data = r.text.replace('    ', ' ')
+    if '   ' in data:
+        data = data.replace('   ',' ')
+    if '  ' in data:
+        data = data.replace('  ',' ')
+    data = data.replace('Ｃ','C')
+    data = data.replace('Ａ', 'A')
+    data = data.replace('Ｂ', 'B')
+    data = data.replace('Ｄ','D')
 
 def open_browser(url):
     option = webdriver.ChromeOptions()
@@ -475,10 +483,10 @@ def FindExclusiveAnswer(question):
         ansChoice = NewQues.split("答案：")[1].split("\r")[0]
     except:
         return ' '
-    A = NewQues[NewQues.find('A'):][2:].split("\r")[0]
-    B = NewQues[NewQues.find('B'):][2:].split("\r")[0]
-    C = NewQues[NewQues.find('C'):][2:].split("\r")[0]
-    D = NewQues[NewQues.find('D'):][2:].split("\r")[0]
+    A = NewQues[NewQues.find('A'):][2:].split("\r")[0].strip().replace(' ','')
+    B = NewQues[NewQues.find('B'):][2:].split("\r")[0].strip().replace(' ','')
+    C = NewQues[NewQues.find('C'):][2:].split("\r")[0].strip().replace(' ','')
+    D = NewQues[NewQues.find('D'):][2:].split("\r")[0].strip().replace(' ', '')
     if ansChoice == 'A':
         ans = A
     elif ansChoice == 'B':
@@ -497,10 +505,10 @@ def FindMutipleAnswer(question):
         ansChoice = NewQues.split("答案：")[1].split("\r")[0]
     except:
         return []
-    A = NewQues[NewQues.find('A'):][2:].split("\r")[0]
-    B = NewQues[NewQues.find('B'):][2:].split("\r")[0]
-    C = NewQues[NewQues.find('C'):][2:].split("\r")[0]
-    D = NewQues[NewQues.find('D'):][2:].split("\r")[0]
+    A = NewQues[NewQues.find('A'):][2:].split("\r")[0].replace(' ','')
+    B = NewQues[NewQues.find('B'):][2:].split("\r")[0].replace(' ','')
+    C = NewQues[NewQues.find('C'):][2:].split("\r")[0].replace(' ','')
+    D = NewQues[NewQues.find('D'):][2:].split("\r")[0].replace(' ', '')
     ansList = []
     for c in ansChoice:
         if c == 'A':
@@ -519,9 +527,18 @@ def FindTorFAndFillTheBlank(question):
     NewQues = data[position:]
     try:
         ans = NewQues.split("答案：")[1].split("\r")[0]
+        if '。' in ans:
+            ans = ans.replace('。','')
     except:
         return None
     return ans
+
+
+def is_Chinese(word):
+    for ch in word:
+        if '\u4e00' <= ch <= '\u9fff':
+            return True
+    return False
 
 
 def weekweekpractice():
@@ -613,8 +630,22 @@ def weekweekpractice():
             type_4 = None
         
         time.sleep(1)
-        question = driver.find_element_by_xpath(
+        old_question = driver.find_element_by_xpath(
             "//div[@class = 'fl'][1]/h1[@class = 'f18']").text  # 题目
+        
+        question = ''
+
+        for index, val in enumerate(old_question):
+            if index > 0 and index < len(old_question):
+                if old_question[index] == ' ' and is_Chinese(old_question[index-1]) and is_Chinese(old_question[index+1]):
+                    pass
+                else:
+                    question += old_question[index]
+            else:
+                question += old_question[index]
+        if '①' in question:
+            question.replace('①', '\r\n①')
+        
         if type_1 == '单选题':
             circleA = driver.find_element_by_xpath("//div[@class='fl'][2]/dl[@class='mt20 fl mr40']/dt")
             circleB = driver.find_element_by_xpath("//div[@class='fl'][3]/dl[@class='mt20 fl mr40']/dt")
@@ -782,6 +813,20 @@ def weekweekpractice():
                     cnt += 1
             elif "、" in ans:
                 ansList = ans.split("、")
+                cnt = 0
+                for i in ansList:
+                    time.sleep(0.5)
+                    blank[cnt].send_keys(i)
+                    cnt += 1
+            elif "  " in ans:
+                ansList = ans.split("  ")
+                cnt = 0
+                for i in ansList:
+                    time.sleep(0.5)
+                    blank[cnt].send_keys(i)
+                    cnt += 1
+            elif " " in ans:
+                ansList = ans.split(" ")
                 cnt = 0
                 for i in ansList:
                     time.sleep(0.5)
@@ -1048,9 +1093,9 @@ def GUI():
         else:
             break
         # sg.Popup('Title',
-        #         'The results of the window.',
-        #         'The button clicked was "{}"'.format(event),
-        #         'The values are', values)
+        #         'THE RESULTS OF THE WINDOW.',
+        #         'THE BUTTON CLICKED WAS "{}"'.FORMAT(EVENT),
+        #         'THE VALUES ARE', VALUES)
     window.close()
 
 
