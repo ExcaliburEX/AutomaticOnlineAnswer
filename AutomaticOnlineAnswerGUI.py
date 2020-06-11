@@ -650,12 +650,19 @@ def weekweekpractice():
             circleA = driver.find_element_by_xpath("//div[@class='fl'][2]/dl[@class='mt20 fl mr40']/dt")
             circleB = driver.find_element_by_xpath("//div[@class='fl'][3]/dl[@class='mt20 fl mr40']/dt")
             circleC = driver.find_element_by_xpath("//div[@class='fl'][4]/dl[@class='mt20 fl mr40']/dt")
-            circleD = driver.find_element_by_xpath("//div[@class='fl'][5]/dl[@class='mt20 fl mr40']/dt")
+            try:
+                circleD = driver.find_element_by_xpath("//div[@class='fl'][5]/dl[@class='mt20 fl mr40']/dt")
+            except:
+                print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"没有第四个选项")
+                circleD = None
+                
             choiceA = driver.find_element_by_xpath("//div[@class='fl'][2]/dl[@class='mt20 fl mr40']/dd").text
             choiceB = driver.find_element_by_xpath("//div[@class='fl'][3]/dl[@class='mt20 fl mr40']/dd").text
             choiceC = driver.find_element_by_xpath("//div[@class='fl'][4]/dl[@class='mt20 fl mr40']/dd").text
-            choiceD = driver.find_element_by_xpath("//div[@class='fl'][5]/dl[@class='mt20 fl mr40']/dd").text
-
+            try:
+                choiceD = driver.find_element_by_xpath("//div[@class='fl'][5]/dl[@class='mt20 fl mr40']/dd").text
+            except:
+                choiceD = ''
             try:
                 ans = FindExclusiveAnswer(question)
             except:
@@ -672,7 +679,10 @@ def weekweekpractice():
             if ans == ' ':
                 print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                     time.localtime()), "第%d题找不到答案！" % (page-1))
-                random.choice([circleA, circleB, circleC, circleD]).click()
+                try:
+                    random.choice([circleA, circleB, circleC, circleD]).click()
+                except:
+                    circleC.click()
                 time.sleep(1)
                 try:
                     driver.find_element_by_xpath(
@@ -687,17 +697,26 @@ def weekweekpractice():
             elif ans == choiceC:
                 circleC.click()
             else: 
-                circleD.click()
+                try:
+                    circleD.click()
+                except:
+                    circleC.click()
         elif type_2 == '多选题':
             circleA = driver.find_element_by_xpath("//div[@class='fl'][2]/dl[@class='mt20 fl mr40']/dt")
             circleB = driver.find_element_by_xpath("//div[@class='fl'][3]/dl[@class='mt20 fl mr40']/dt")
             circleC = driver.find_element_by_xpath("//div[@class='fl'][4]/dl[@class='mt20 fl mr40']/dt")
-            circleD = driver.find_element_by_xpath("//div[@class='fl'][5]/dl[@class='mt20 fl mr40']/dt")
-
+            try:
+                circleD = driver.find_element_by_xpath("//div[@class='fl'][5]/dl[@class='mt20 fl mr40']/dt")
+            except:
+                print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"没有第四个选项")
+                circleD = None
             choiceA = driver.find_element_by_xpath("//div[@class='fl'][2]/dl[@class='mt20 fl mr40']/dd").text
             choiceB = driver.find_element_by_xpath("//div[@class='fl'][3]/dl[@class='mt20 fl mr40']/dd").text
             choiceC = driver.find_element_by_xpath("//div[@class='fl'][4]/dl[@class='mt20 fl mr40']/dd").text
-            choiceD = driver.find_element_by_xpath("//div[@class='fl'][5]/dl[@class='mt20 fl mr40']/dd").text
+            try:
+                choiceD = driver.find_element_by_xpath("//div[@class='fl'][5]/dl[@class='mt20 fl mr40']/dd").text
+            except:
+                choiceD = ''
             try:
                 ans = FindMutipleAnswer(question)
             except:
@@ -726,7 +745,10 @@ def weekweekpractice():
                 time.sleep(0.5)
                 circleC.click()
                 time.sleep(0.5)
-                circleD.click()
+                try:
+                    circleD.click()
+                except:
+                    pass
                 time.sleep(1)
                 try:
                     driver.find_element_by_xpath(
@@ -802,38 +824,43 @@ def weekweekpractice():
                 except:
                     break
                 continue
-            if "。" in ans:
-                ans.replace("。","")
-            if "；" in ans:
-                ansList = ans.split("；")
-                cnt = 0
-                for i in ansList:
-                    time.sleep(0.5)
-                    blank[cnt].send_keys(i)
-                    cnt += 1
-            elif "、" in ans:
-                ansList = ans.split("、")
-                cnt = 0
-                for i in ansList:
-                    time.sleep(0.5)
-                    blank[cnt].send_keys(i)
-                    cnt += 1
-            elif "  " in ans:
-                ansList = ans.split("  ")
-                cnt = 0
-                for i in ansList:
-                    time.sleep(0.5)
-                    blank[cnt].send_keys(i)
-                    cnt += 1
-            elif " " in ans:
-                ansList = ans.split(" ")
-                cnt = 0
-                for i in ansList:
-                    time.sleep(0.5)
-                    blank[cnt].send_keys(i)
-                    cnt += 1
-            else:
+            try:
+                if "。" in ans:
+                    ans.replace("。","")
+                if "；" in ans:
+                    ansList = ans.split("；")
+                    cnt = 0
+                    for i in ansList:
+                        time.sleep(0.5)
+                        blank[cnt].send_keys(i)
+                        cnt += 1
+                elif "、" in ans:
+                    ansList = ans.split("、")
+                    cnt = 0
+                    for i in ansList:
+                        time.sleep(0.5)
+                        blank[cnt].send_keys(i)
+                        cnt += 1
+                elif "  " in ans:
+                    ansList = ans.split("  ")
+                    cnt = 0
+                    for i in ansList:
+                        time.sleep(0.5)
+                        blank[cnt].send_keys(i)
+                        cnt += 1
+                elif " " in ans:
+                    ansList = ans.split(" ")
+                    cnt = 0
+                    for i in ansList:
+                        time.sleep(0.5)
+                        blank[cnt].send_keys(i)
+                        cnt += 1
+                else:
+                    blank[0].send_keys(ans)
+            except:
+                blank[0].clear()
                 blank[0].send_keys(ans)
+                print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"明明有2个或者多个括号填空，却只给一个填空，66666真强！")
         time.sleep(2)
         try:
             driver.find_element_by_xpath(
