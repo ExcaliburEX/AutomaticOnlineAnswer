@@ -94,7 +94,7 @@ def login(user, password, url):
     driver.set_window_size(width=800, height=800, windowHandle="current")
     driver.find_elements_by_class_name('el-input__inner')[0].clear()
     driver.find_elements_by_class_name(
-        'el-input__inner')[0].send_keys(user)  
+        'el-input__inner')[0].send_keys(user)
     driver.find_elements_by_class_name('el-input__inner')[1].clear()
     driver.find_elements_by_class_name(
         'el-input__inner')[1].send_keys(password)  
@@ -456,7 +456,7 @@ def daydaylearn(num):
         driver.refresh()
         time.sleep(1)
         driver.find_element_by_xpath(
-            "//div[@class='he_exam_studying']/ul/li[1]").click()  # 日日学
+            "//ul[@class='pb30 mt50']/li[1]").click()  # 日日学
         time.sleep(1)
         driver.find_element_by_xpath(
             "//a[@class='btn01_cui cursor mt100']").click()  # 开始答题
@@ -541,6 +541,30 @@ def is_Chinese(word):
     return False
 
 
+
+def monthmonthcompete():
+    print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+              time.localtime()), "开始月月比进程！")
+    global page
+    driver = open_browser(url)
+    for cookie in cookiesList:
+        driver.add_cookie(cookie)
+    time.sleep(1)
+    driver.refresh()
+    time.sleep(1)
+    driver.find_element_by_xpath(
+        "//div[@class='he_exam_studying']/ul/li[3]").click()  # 周周练
+    time.sleep(2)
+    button_flag = 0
+    driver.find_element_by_xpath("//span[@class='el-checkbox__input']/span[@class='el-checkbox__inner']").click()  # 已经阅读规则
+    time.sleep(1)
+    driver.find_element_by_xpath(
+        "//span[@class='Clearfix']/img[@class='Clearfix m0 mt50']").click()  # 开始比试
+    
+
+
+
+
 def weekweekpractice():
     print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),"开始周周练进程！")
     global page
@@ -551,7 +575,7 @@ def weekweekpractice():
     driver.refresh()
     time.sleep(1)
     driver.find_element_by_xpath(
-        "//div[@class='he_exam_studying']/ul/li[2]").click()  # 周周练
+        "//ul[@class='pb30 mt50']/li[2]").click()  # 周周练
     time.sleep(2)
     button_flag = 0
     try:
@@ -869,7 +893,7 @@ def weekweekpractice():
             break
 
 
-# def monthmonthcompete():
+
     
 
 
@@ -1012,7 +1036,7 @@ def new_login(input_kapcatch):
 
 
 def GUI():
-    sg.ChangeLookAndFeel('GreenTan')
+    #sg.ChangeLookAndFeel('GreenTan')
 
     # ------ Menu Definition ------ #
     # menu_def = [['&File', ['&Open', '&Save', 'E&xit', 'Properties']],
@@ -1068,7 +1092,7 @@ def GUI():
         [sg.Cancel('退出', font=("Noto Serif SC", 10), button_color=('white', 'red'), size=(5, 1))]]
 
     window = sg.Window('自动答题系统', layout,
-                       default_element_size=(40, 1), grab_anywhere=True, resizable=True, text_justification='center')
+                       default_element_size=(40, 1), grab_anywhere=False, resizable=True, text_justification='center')
 
     T_data = threading.Thread(target=UpdateData,args=(window,))
     T_data.start()
@@ -1111,8 +1135,8 @@ def GUI():
             t7 = threading.Thread(target=weekweekpractice)
             t7.start()
         elif event == '启动月月比答题进程':
-            # t8 = threading.Thread(target=monthmonthcompete)
-            # t8.start()
+            t8 = threading.Thread(target=monthmonthcompete)
+            t8.start()
             pass
         elif event == 'GETCODE':
             t9 = threading.Thread(target=get_verification_cd, args=(str(values['-USER-']), str(values['-PASSWORD-']), log_url,window))

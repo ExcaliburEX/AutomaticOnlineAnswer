@@ -1,4 +1,6 @@
 {
     "python.pythonPath": "D:\\Software\\Anaconda\\python.exe",
-    "window.zoomLevel": 0
+    "window.zoomLevel": 0,
+    "editor.snippetSuggestions": "bottom",
+    "editor.suggest.snippetsPreventQuickSuggestions": false
 }
