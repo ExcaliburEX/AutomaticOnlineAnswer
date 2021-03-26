@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "D:\\Software\\Anaconda\\python.exe",
+    "python.pythonPath": "D:\\Software\\Anaconda\\envs\\AutoOA\\python.exe",
     "window.zoomLevel": 0,
     "editor.snippetSuggestions": "bottom",
     "editor.suggest.snippetsPreventQuickSuggestions": false

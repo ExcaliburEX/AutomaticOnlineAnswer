@@ -7,6 +7,13 @@
 
 <div align="center">
 
+![visitors](https://visitor-badge.glitch.me/badge?page_id=ExcaliburEX.AutomaticOnlineAnswer)
+
+<img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.6/total?color=pink&style=for-the-badge">
+
+<img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.5/total?color=important&style=for-the-badge">
+
+
 [![HitCount](http://hits.dwyl.com/ExcaliburEX/AutomaticOnlineAnswer.svg)](http://hits.dwyl.com/ExcaliburEX/AutomaticOnlineAnswer)
 [![Build Status](https://www.travis-ci.org/ExcaliburEX/AutomaticOnlineAnswer.svg?branch=master)](https://www.travis-ci.org/ExcaliburEX/AutomaticOnlineAnswer)
 [![GitHub Issues](https://img.shields.io/github/issues/ExcaliburEX/AutomaticOnlineAnswer.svg)](https://github.com/ExcaliburEX/AutomaticOnlineAnswer)
