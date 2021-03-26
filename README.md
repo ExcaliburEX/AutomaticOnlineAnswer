@@ -9,9 +9,8 @@
 
 ![visitors](https://visitor-badge.glitch.me/badge?page_id=ExcaliburEX.AutomaticOnlineAnswer)
 
-<img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.6/total?color=pink&style=for-the-badge">
-
-<img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.5/total?color=important&style=for-the-badge">
+<a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.6/AutomaticOnlineAnswerGUI.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.6/total?color=pink&style=for-the-badge"></a>
+<a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.5/AutoOA3.5.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.5/total?color=important&style=for-the-badge"></a>
 
 
 [![HitCount](http://hits.dwyl.com/ExcaliburEX/AutomaticOnlineAnswer.svg)](http://hits.dwyl.com/ExcaliburEX/AutomaticOnlineAnswer)
