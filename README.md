@@ -9,6 +9,7 @@
 
 ![visitors](https://visitor-badge.glitch.me/badge?page_id=ExcaliburEX.AutomaticOnlineAnswer)
 
+<a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.7/AutoOA3.7.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.7/total?color=pink&style=for-the-badge"></a>
 <a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.6/AutomaticOnlineAnswerGUI.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.6/total?color=pink&style=for-the-badge"></a>
 <a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.5/AutoOA3.5.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.5/total?color=important&style=for-the-badge"></a>
 
@@ -61,3 +62,6 @@
   - 月月比
 ## 🍇 2020-06-09
 - 经细心网友，提供新的题库，并优化了网页中题目的空格，和全角半角标点以及括号中的三个或者四个空格，优化了题库，实现正确题数>=28
+
+## 🍇 2021-05-09
+- 感谢 @[miaoxw](https://github.com/miaoxw)  实现月月比 :smile:！题库已上传到腾讯云OSS存储，无需配置，根据的是官方最新题库配置：http://www.mohrss.gov.cn/SYrlzyhshbzb/rdzt/qgrsckdwywjnlbbw/lgbwtk/
