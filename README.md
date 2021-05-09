@@ -9,7 +9,7 @@
 
 ![visitors](https://visitor-badge.glitch.me/badge?page_id=ExcaliburEX.AutomaticOnlineAnswer)
 
-<a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.7/AutoOA3.7.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.7/total?color=pink&style=for-the-badge"></a>
+<a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.7/AutoOA3.7.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.7/total?color=blue&style=for-the-badge"></a>
 <a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.6/AutomaticOnlineAnswerGUI.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.6/total?color=pink&style=for-the-badge"></a>
 <a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.5/AutoOA3.5.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.5/total?color=important&style=for-the-badge"></a>
 
