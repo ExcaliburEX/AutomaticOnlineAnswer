@@ -28,7 +28,9 @@
 
 # 更新日志
 
-## 🍇 2021-05-09
+## 🍳 2021-05-17
+- 加入在线人数统计，最新版本下载链接：[AutoOA3.7.exe](https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.7/AutoOA3.7.exe)
+## 🥝 2021-05-09
 - 感谢 @[miaoxw](https://github.com/miaoxw)  实现月月比 :smile:！题库已上传到腾讯云OSS存储，无需配置，根据的是官方最新题库配置：http://www.mohrss.gov.cn/SYrlzyhshbzb/rdzt/qgrsckdwywjnlbbw/lgbwtk/
 
 

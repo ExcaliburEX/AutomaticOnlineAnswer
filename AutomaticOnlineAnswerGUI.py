@@ -1,7 +1,8 @@
+from sys import flags
+import pymysql
 import PySimpleGUI as sg
 from selenium import webdriver
 import time
-from selenium.webdriver.common.action_chains import ActionChains
 import random
 import threading
 import requests
@@ -11,6 +12,9 @@ from selenium.webdriver.support import \
     expected_conditions as ExpectedConditions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+import socket
+import requests
+import re
 
 cookiesList = []
 log_url = 'https://bw.chinahrt.com.cn/#/login'
@@ -26,6 +30,8 @@ img = b'iVBORw0KGgoAAAANSUhEUgAAAH0AAAAyCAYAAABxjtScAAAHgElEQVR4nO2bX0hTbx/AP3Pn
 log_driver = None
 ansnum = 0
 anscnt = 0
+global flag
+flag = 1
 
 
 def FetchStatistics():
@@ -83,19 +89,33 @@ def FetchStatistics():
 
 def FetchQuestionData():
     global r
+    global flag
     # r = requests.get('https://blog-1259799643.cos.ap-shanghai.myqcloud.com/2020-06-08-%E9%A2%98%E5%BA%93.txt')
-    r = requests.get('https://blog-1259799643.cos.ap-shanghai.myqcloud.com/2021-5-8-%E9%A2%98%E5%BA%932.txt')
-    r.encoding = 'gbk'
-    global data
-    data = r.text.replace('    ', ' ')
-    if '   ' in data:
-        data = data.replace('   ', ' ')
-    if '  ' in data:
-        data = data.replace('  ', ' ')
-    data = data.replace('Ｃ', 'C')
-    data = data.replace('Ａ', 'A')
-    data = data.replace('Ｂ', 'B')
-    data = data.replace('Ｄ', 'D')
+    cnt = 1
+    while True:
+        try:
+            r = requests.get('https://blog-1259799643.cos.ap-shanghai.myqcloud.com/2021-5-8-%E9%A2%98%E5%BA%932.txt')
+            r.encoding = 'gbk'
+            global data
+            data = r.text.replace('    ', ' ')
+            if '   ' in data:
+                data = data.replace('   ', ' ')
+            if '  ' in data:
+                data = data.replace('  ', ' ')
+            data = data.replace('Ｃ', 'C')
+            data = data.replace('Ａ', 'A')
+            data = data.replace('Ｂ', 'B')
+            data = data.replace('Ｄ', 'D')
+            break
+        except:
+            print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),
+              "题库获取失败，超过三次建议重启或者更换网络，正在尝试第%d次" % (cnt))
+            cnt += 1
+            if cnt == 5:
+                break
+            time.sleep(2)
+        if flag == 0:
+            break
 
 
 def open_browser(url):
@@ -597,7 +617,13 @@ def monthmonthcompete(flag):
     if flag == 0:
         driver.find_element_by_xpath("//div[@class='imgText'][1]/img[@class='Clearfix fl mt20']").click()  # pk对战
         time.sleep(1)
-        driver.find_element_by_xpath("//div[@class='selectProvinceArea']/ul[@class='selectProvinceList']/li["+str(random.randint(1,29))+"]").click()  # 随机选择地区
+        while True:
+            try:
+                driver.find_element_by_xpath("//div[@class='selectProvinceArea']/ul[@class='selectProvinceList']/li["+str(random.randint(1,29))+"]").click()  # 随机选择地区
+                break
+            except:
+                pass
+            
         time.sleep(0.5)
         driver.find_element_by_xpath("//div[@class='mt20 btnBattle tc']/a[@class='continueWait tc']").click()  # 继续按钮
         time.sleep(1)
@@ -1164,6 +1190,7 @@ def weekweekpractice():
 def UpdateData(window):
     global login_flag
     global finish_flag
+    global flag
     while True:
         time.sleep(1)
         if login_flag == 1:
@@ -1220,13 +1247,18 @@ def UpdateData(window):
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                   time.localtime()), "数据刷新成功！")
             finish_flag = 0
+        if flag == 0:
+            break
 
 
 def UpdateQuesData(window):
+    global flag 
     global page
     while True:
         time.sleep(1)
         window.FindElement("-PROGRESS-").update(page-1)
+        if flag == 0:
+            break
 
 
 def transparent_back(img):
@@ -1247,42 +1279,50 @@ def get_verification_cd(user, password, url, window):
     print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
           time.localtime()), "正在获取验证码...")
     global log_driver
-    chrome_opts = webdriver.ChromeOptions()
-    chrome_opts.add_argument("--headless")
-    chrome_opts.add_experimental_option('excludeSwitches', ['enable-logging'])
-    driver = webdriver.Chrome(options=chrome_opts)
-    driver.get(url)
-    driver.set_window_size(width=800, height=800, windowHandle="current")
-    driver.find_elements_by_class_name('el-input__inner')[0].clear()
-    driver.find_elements_by_class_name(
-        'el-input__inner')[0].send_keys(user)
-    driver.find_elements_by_class_name('el-input__inner')[1].clear()
-    driver.find_elements_by_class_name(
-        'el-input__inner')[1].send_keys(password)
-    # kaptcha_url = driver.find_element_by_id('safecode').get_attribute('src')
-    # r = requests.get(kaptcha_url)
-    # with open('img.jpg', 'wb') as f:
-    #     f.write(r.content)
-    # f.close()
-    kaptcha = driver.find_element_by_id('safecode')
-    kaptcha.screenshot('img.png')
-    # img = Image.open('img.jpg')
-    # img = transparent_back(img)
-    # img.save('imgcode.png')
-    with open('img.png', 'rb') as f:
-        image = f.read()
-    f.close()
-    os.remove('img.png')
-    # os.remove('imgcode.png')
-    base64_data = base64.b64encode(image)
-    imgNew = base64_data.decode('utf-8')
-    imgNew = bytes(imgNew, encoding="utf8")
-    window['safecode'].update(data=imgNew)
-    print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()), "获取验证码成功！")
-    log_driver = driver
+    if user=='' or password=='':
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+          time.localtime()), "请先输入账密！")
+        return 
+    try:
+        chrome_opts = webdriver.ChromeOptions()
+        chrome_opts.add_argument("--headless")
+        chrome_opts.add_experimental_option('excludeSwitches', ['enable-logging'])
+        driver = webdriver.Chrome(options=chrome_opts)
+        driver.get(url)
+        driver.set_window_size(width=800, height=800, windowHandle="current")
+        driver.find_elements_by_class_name('el-input__inner')[0].clear()
+        driver.find_elements_by_class_name(
+            'el-input__inner')[0].send_keys(user)
+        driver.find_elements_by_class_name('el-input__inner')[1].clear()
+        driver.find_elements_by_class_name(
+            'el-input__inner')[1].send_keys(password)
+        # kaptcha_url = driver.find_element_by_id('safecode').get_attribute('src')
+        # r = requests.get(kaptcha_url)
+        # with open('img.jpg', 'wb') as f:
+        #     f.write(r.content)
+        # f.close()
+        kaptcha = driver.find_element_by_id('safecode')
+        kaptcha.screenshot('img.png')
+        # img = Image.open('img.jpg')
+        # img = transparent_back(img)
+        # img.save('imgcode.png')
+        with open('img.png', 'rb') as f:
+            image = f.read()
+        f.close()
+        os.remove('img.png')
+        # os.remove('imgcode.png')
+        base64_data = base64.b64encode(image)
+        imgNew = base64_data.decode('utf-8')
+        imgNew = bytes(imgNew, encoding="utf8")
+        window['safecode'].update(data=imgNew)
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()), "获取验证码成功！")
+        log_driver = driver
+    except:
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+          time.localtime()), "chromedriver没有配置或者需要更新！")
 
 
-def new_login(input_kapcatch):
+def new_login(input_kapcatch,user):
     global log_driver
     global cookiesList
     log_driver.find_elements_by_xpath(
@@ -1292,6 +1332,9 @@ def new_login(input_kapcatch):
     time.sleep(1)
     if log_driver.find_elements_by_class_name('el-input__inner') == []:
         print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()), "登录成功！")
+        if user!= '':
+            t_writeuser2mySQL = threading.Thread(target=WriteUser2MySQL, args=(user,))
+            t_writeuser2mySQL.start()
         log_driver.refresh()
         cookiesList = log_driver.get_cookies()
         time.sleep(1)
@@ -1301,6 +1344,95 @@ def new_login(input_kapcatch):
     else:
         print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                             time.localtime()), "登录失败，请重新获取验证码！")
+
+
+
+def MySQLConnect():
+    global flag
+    while True:
+        try:
+            conn = pymysql.connect(host='47.96.189.80', port=3306,user="root", passwd="189154", db="AutoOA")
+            return conn
+        except:
+            print(time.strftime("[%Y-%m-%d %H:%M:%S]: ", time.localtime()), '重连数据库中...')
+            time.sleep(2)
+            try:
+                conn.close()
+            except:
+                pass
+        if flag == 0:
+            try:
+                conn.close()
+            except:
+                pass
+            break
+    
+
+
+def UpdateOnlineUserNum(window):
+    global flag
+    old = 0
+    while True:
+        conn = MySQLConnect()
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT count(*) from user where onlineState='T'")
+            res = cursor.fetchone()
+            number = res[0]
+            window['-USERNUM-'].update(number)
+            if number > old:
+                print(time.strftime("[%Y-%m-%d %H:%M:%S]: ", time.localtime()), '当前有%d位学习者加入了战斗！'%(number))
+            elif number < old:
+                print(time.strftime("[%Y-%m-%d %H:%M:%S]: ", time.localtime()), '当前有%d位学习者离开了战斗~'%(number))
+            old = number
+            cursor.close()
+            conn.close()
+            time.sleep(3)
+        except:
+            pass
+        if flag == 0:
+            break
+        
+
+def GetIP():
+    req = requests.get("http://txt.go.sohu.com/ip/soip")
+    ip = re.findall(r'\d+.\d+.\d+.\d+', str(req.content))
+    return ip[0]
+
+
+def WriteUser2MySQL(account):
+    conn = MySQLConnect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * from user where user_account = '%s'"%(account))
+    res = cursor.fetchall()
+    try:
+        ip = GetIP()
+    except:
+        ip = '6.6.6.6'
+    if len(res) == 0:
+        print(666)
+        cursor.execute("insert into user(user_ip,user_account,onlineState) values('%s','%s','T')"%(str(ip),str(account)))
+    else:
+        cursor.execute("UPDATE user SET user_ip='%s', onlineState='T' WHERE user_account='%s'"%(str(ip),str(account)))
+    cursor.close()
+    conn.commit()
+    conn.close()
+        
+def UpdateUserInMySQL(account):
+    try:
+        conn = MySQLConnect()
+        cursor = conn.cursor()
+        try:
+            ip = GetIP()
+        except:
+            ip = '6.6.6.6'
+        cursor.execute("UPDATE user SET user_ip='%s', onlineState='F' WHERE user_account='%s'"%(str(ip),str(account)))
+        cursor.close()
+        conn.commit()
+        conn.close()
+    except:
+        pass
+        
 
 
 def GUI():
@@ -1322,55 +1454,59 @@ def GUI():
     headings = ['正确率', '正确题数', '错误题数', '总题量']
     layout = [
         # [sg.Menu(menu_def, tearoff=True)],
-        [sg.Text('全国人社窗口单位业务技能练兵比武——冠军小霸王', size=(
-            40, 1), justification='center', font=("Noto Serif SC", 18), relief=sg.RELIEF_RIDGE)],
+        [sg.Text('人社窗口单位业务技能练兵比武V3.7完全版', size=(
+            40, 1), justification='center', font=("KaiTi", 18), relief=sg.RELIEF_RIDGE)],
         [sg.Text('请先获取验证码，进行登录，随后再进行各项进程，可多开。', size=(
-            70, 1), font=("Noto Serif SC", 10), text_color='blue')],
-        [sg.Frame('登录选项', [[sg.Text('账号：'),
+            70, 1), font=("KaiTi", 10), text_color='blue')],
+        [sg.Text('当前在线用户数：', font=("KaiTi", 12), size=(18, 1)),sg.Text('暂无数据', font=("Comic Sans MS", 12),
+                    size=(18, 1), relief=sg.RELIEF_RIDGE, key='-USERNUM-')],
+        [sg.Frame('登录选项', [[sg.Text('账号：', font=("KaiTi", 10)),
                            sg.InputText('', size=(
                                80, 1), key='-USER-')],
-                           [sg.Text('密码：'),
+                           [sg.Text('密码：', font=("KaiTi", 10)),
                             sg.InputText('', key='-PASSWORD-', size=(
-                                80, 1))], [sg.Frame('验证码', [[sg.Image(data=img, key='safecode'), sg.Button('获取验证码', key='GETCODE'), sg.InputText('', key='CODEBLANK')]]),
-                                           sg.Button('登录', button_color=('white', 'green'), size=(8, 4))]], font=("Noto Serif SC", 25), title_color='Tomato')],
-        [sg.Frame('日日学', [[sg.Text('设置学习题数：'), sg.InputText('30', key='ANSNUM')], [sg.Button('习中特、党十九大精神', font=("Noto Serif SC", 12), button_color=(
-            'white', 'red'), size=(30, 1)),
-            sg.Button('就业创业', font=("Noto Serif SC", 12), button_color=('white', 'purple'), size=(30, 1))],
-            [sg.Button('社会保险', font=("Noto Serif SC", 12), button_color=('white', 'blue'), size=(30, 1)),
-         sg.Button('劳动关系', font=("Noto Serif SC", 12), button_color=('black', 'yellow'), size=(30, 1))],
-            [sg.Button('人事人才', font=("Noto Serif SC", 12), button_color=('white', 'orange'), size=(30, 1)),
-             sg.Button('综合服务标准规范', font=("Noto Serif SC", 12), button_color=(
-                 'white', 'black'), size=(30, 1))]], font=("Noto Serif SC", 25))],
-        [sg.Frame('周周练', [[sg.Button('启动周周练答题进程', font=("Noto Serif SC", 14), button_color=(
-            'yellow', 'purple'), size=(51, 1))]], font=("Noto Serif SC", 25))],
-        [sg.Frame('月月比', [[sg.Button('在线PK', font=("Noto Serif SC", 14), button_color=(
-            'white', 'green'), size=(25, 1)),sg.Button('人机对战', font=("Noto Serif SC", 14), button_color=(
-            'white', 'orange'), size=(25, 1))]], font=("Noto Serif SC", 25))],
-        [sg.Text('当前周周练做题进度：'), sg.Text('无数据', size=(3, 1), text_color='pink', font=(
-            "Noto Serif SC", 15), relief=sg.RELIEF_RIDGE, key='-PROGRESS-', pad=(0, 0))],
-        # [sg.Text('  ')] + [sg.Text(h, size=(6, 1), font=("Noto Serif SC", 10))
+                                80, 1))], [sg.Frame('验证码', [[sg.Image(data=img, key='safecode'), sg.Button('获取验证码', key='GETCODE', size=(10, 2),font=("KaiTi", 10)), sg.InputText('', key='CODEBLANK')]], font=("KaiTi", 18)),
+                                           sg.Button('登录', font=("KaiTi", 12), button_color=('white', 'green'), size=(8, 4))]], font=("KaiTi", 25), title_color='Tomato')],
+        [sg.Frame('日日学', [[sg.Text('设置学习题数：', font=("KaiTi", 10)), sg.InputText('30', key='ANSNUM')], [sg.Button('习中特、党十九大精神', font=("KaiTi", 12), button_color=(
+            'white', 'red'), size=(37, 1)),
+            sg.Button('就业创业', font=("KaiTi", 12), button_color=('white', 'purple'), size=(37, 1))],
+            [sg.Button('社会保险', font=("KaiTi", 12), button_color=('white', 'blue'), size=(37, 1)),
+         sg.Button('劳动关系', font=("KaiTi", 12), button_color=('black', 'yellow'), size=(37, 1))],
+            [sg.Button('人事人才', font=("KaiTi", 12), button_color=('white', 'orange'), size=(37, 1)),
+             sg.Button('综合服务标准规范', font=("KaiTi", 12), button_color=(
+                 'white', 'black'), size=(37, 1))]], font=("KaiTi", 25))],
+        [sg.Frame('周周练', [[sg.Button('启动周周练答题进程', font=("KaiTi", 14), button_color=(
+            'yellow', 'purple'), size=(61, 1))]], font=("KaiTi", 25))],
+        [sg.Frame('月月比', [[sg.Button('在线PK', font=("KaiTi", 14), button_color=(
+            'white', 'green'), size=(29, 1)),sg.Button('人机对战', font=("KaiTi", 14), button_color=(
+            'white', 'orange'), size=(29, 1))]], font=("KaiTi", 25))],
+        [sg.Text('当前周周练做题进度：', font=("KaiTi", 10)), sg.Text('无数据', size=(6, 1), text_color='pink', font=(
+            "KaiTi", 15), relief=sg.RELIEF_RIDGE, key='-PROGRESS-', pad=(0, 0))],
+        # [sg.Text('  ')] + [sg.Text(h, size=(6, 1), font=("KaiTi", 10))
         #                    for h in headings],
-        # [sg.Frame('数据展示', [[sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), text_color='blue', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-T1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-T2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-T3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-T4-', pad=(0, 0))]
-        #                                      ], title='汇总情况', title_color='red', relief=sg.RELIEF_SUNKEN, font=("Noto Serif SC", 8), tooltip='Use these to set flags')],
-         [sg.Frame('数据展示', [[sg.Text("  "+h, size=(8, 1), font=("Noto Serif SC", 8), pad=(0, 0))
+        # [sg.Frame('数据展示', [[sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), text_color='blue', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-T1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-T2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-T3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-T4-', pad=(0, 0))]
+        #                                      ], title='汇总情况', title_color='red', relief=sg.RELIEF_SUNKEN, font=("KaiTi", 8), tooltip='Use these to set flags')],
+         [sg.Frame('数据展示', [[sg.Text("  "+h, size=(8, 1), font=("KaiTi", 8), pad=(0, 0))
                             for h in headings],
-                           [sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), text_color='blue', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-T1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-T2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-T3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-T4-', pad=(0, 0))]
-                                             ], title='汇总情况', title_color='red', relief=sg.RELIEF_SUNKEN, font=("Noto Serif SC", 8), tooltip='Use these to set flags')],
-                           [sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), text_color='purple', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-D1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='purple', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-D2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='purple', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-D3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='purple', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-D4-', pad=(0, 0))]
-                                             ], title='日日学', title_color='red', relief=sg.RELIEF_SUNKEN, font=("Noto Serif SC", 8), tooltip='Use these to set flags')],
-                           [sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), text_color='green', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-Z1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='green', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-Z2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='green', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-Z3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='green', font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-Z4-', pad=(0, 0))]
-                                             ], title='周周练', title_color='red', relief=sg.RELIEF_SUNKEN, font=("Noto Serif SC", 8), tooltip='Use these to set flags')],
-                           [sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-Y1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-Y2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-Y3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), font=("Noto Serif SC", 8), relief=sg.RELIEF_RIDGE, key='-Y4-', pad=(0, 0))]
-                                             ], title='月月比', title_color='red', relief=sg.RELIEF_SUNKEN, font=("Noto Serif SC", 10), tooltip='Use these to set flags')]]), sg.Output(size=(50, 10))],
-        [sg.Cancel('退出', font=("Noto Serif SC", 10), button_color=('white', 'red'), size=(5, 1))]]
+                           [sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), text_color='blue', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-T1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-T2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-T3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-T4-', pad=(0, 0))]
+                                             ], title='汇总情况', title_color='red', relief=sg.RELIEF_SUNKEN, font=("KaiTi", 8), tooltip='Use these to set flags')],
+                           [sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), text_color='purple', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-D1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='purple', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-D2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='purple', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-D3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='purple', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-D4-', pad=(0, 0))]
+                                             ], title='日日学', title_color='red', relief=sg.RELIEF_SUNKEN, font=("KaiTi", 8), tooltip='Use these to set flags')],
+                           [sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), text_color='green', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-Z1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='green', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-Z2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='green', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-Z3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='green', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-Z4-', pad=(0, 0))]
+                                             ], title='周周练', title_color='red', relief=sg.RELIEF_SUNKEN, font=("KaiTi", 8), tooltip='Use these to set flags')],
+                           [sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-Y1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-Y2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-Y3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-Y4-', pad=(0, 0))]
+                                             ], title='月月比', title_color='red', relief=sg.RELIEF_SUNKEN, font=("KaiTi", 10), tooltip='Use these to set flags')]], font=("KaiTi", 10)), sg.Output(size=(50, 10))],
+        [sg.Cancel('退出', font=("KaiTi", 10), button_color=('white', 'red'), size=(6, 2))]]
 
-    window = sg.Window('自动答题系统', layout,
-                       default_element_size=(40, 1), grab_anywhere=False, resizable=True, text_justification='center')
+    window = sg.Window('自动答题系统V3.7', layout,
+                       default_element_size=(40, 1), grab_anywhere=False, resizable=True, text_justification='center',finalize=True)
 
     T_data = threading.Thread(target=UpdateData, args=(window,))
     T_data.start()
     T_ques_data = threading.Thread(target=UpdateQuesData, args=(window,))
     T_ques_data.start()
+    t_OnlineUserNum = threading.Thread(target=UpdateOnlineUserNum,args=(window,))
+    t_OnlineUserNum.start()
     global ansnum
     while True:
         event, values = window.read()
@@ -1378,8 +1514,9 @@ def GUI():
         if event == '登录':
             # t1 = threading.Thread(target=login, args=(str(values['-USER-']), str(values['-PASSWORD-']), log_url))
             input_kapcatch = values['CODEBLANK']
-            t1 = threading.Thread(target=new_login, args=(input_kapcatch,))
+            t1 = threading.Thread(target=new_login, args=(input_kapcatch,str(values['-USER-'])))
             t1.start()
+
         elif event == '习中特、党十九大精神':
             t2 = threading.Thread(
                 target=daydaylearn, args=(1, ))
@@ -1420,6 +1557,9 @@ def GUI():
                 str(values['-USER-']), str(values['-PASSWORD-']), log_url, window))
             t9.start()
         else:
+            UpdateUserInMySQL(str(values['-USER-']))
+            global flag
+            flag = 0
             break
         # sg.Popup('Title',
         #         'THE RESULTS OF THE WINDOW.',
