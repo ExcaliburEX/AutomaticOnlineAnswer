@@ -1351,7 +1351,7 @@ def MySQLConnect():
     global flag
     while True:
         try:
-            conn = pymysql.connect(host='47.96.189.80', port=3306,user="root", passwd="189154", db="AutoOA")
+            conn = pymysql.connect()
             return conn
         except:
             print(time.strftime("[%Y-%m-%d %H:%M:%S]: ", time.localtime()), '重连数据库中...')
