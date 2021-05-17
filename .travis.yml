@@ -5,4 +5,4 @@ python:
 install:
     - pip install -r requirements.txt
 script:
-    - python AutomaticOnlineAnswerGUI.py test
+    - python Test.py test

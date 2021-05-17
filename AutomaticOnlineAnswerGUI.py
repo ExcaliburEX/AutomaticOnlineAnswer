@@ -1351,7 +1351,7 @@ def MySQLConnect():
     global flag
     while True:
         try:
-            conn = pymysql.connect()
+            conn = pymysql.connect(host='47.96.189.80', port=3306,user="root", passwd="189154", db="AutoOA")
             return conn
         except:
             print(time.strftime("[%Y-%m-%d %H:%M:%S]: ", time.localtime()), '重连数据库中...')
@@ -1381,9 +1381,9 @@ def UpdateOnlineUserNum(window):
             number = res[0]
             window['-USERNUM-'].update(number)
             if number > old:
-                print(time.strftime("[%Y-%m-%d %H:%M:%S]: ", time.localtime()), '当前有%d位学习者加入了战斗！'%(number))
+                print(time.strftime("[%Y-%m-%d %H:%M:%S]: ", time.localtime()), '当前有%d位学习者加入了战斗！'%(number-old))
             elif number < old:
-                print(time.strftime("[%Y-%m-%d %H:%M:%S]: ", time.localtime()), '当前有%d位学习者离开了战斗~'%(number))
+                print(time.strftime("[%Y-%m-%d %H:%M:%S]: ", time.localtime()), '当前有%d位学习者离开了战斗~'%(old-number))
             old = number
             cursor.close()
             conn.close()
@@ -1410,7 +1410,6 @@ def WriteUser2MySQL(account):
     except:
         ip = '6.6.6.6'
     if len(res) == 0:
-        print(666)
         cursor.execute("insert into user(user_ip,user_account,onlineState) values('%s','%s','T')"%(str(ip),str(account)))
     else:
         cursor.execute("UPDATE user SET user_ip='%s', onlineState='T' WHERE user_account='%s'"%(str(ip),str(account)))
