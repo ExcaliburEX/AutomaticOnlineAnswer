@@ -2,5 +2,6 @@
     "python.pythonPath": "D:\\Software\\Anaconda\\envs\\AutoOA\\python.exe",
     "window.zoomLevel": 0,
     "editor.snippetSuggestions": "bottom",
-    "editor.suggest.snippetsPreventQuickSuggestions": false
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "aiXcoder.showTrayIcon": true
 }

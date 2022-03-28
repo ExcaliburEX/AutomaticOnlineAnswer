@@ -9,6 +9,16 @@
 
 ![visitors](https://visitor-badge.glitch.me/badge?page_id=ExcaliburEX.AutomaticOnlineAnswer)
 
+
+
+---
+
+<h3 align="center">最新版本</h3>
+
+<h3 align="center"><a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.8/AutoOA_V3.8.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.8/total?color=purple&style=for-the-badge"></a></h3>
+
+---
+
 <a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.7/AutoOA_V3.7.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.7/total?color=blue&style=for-the-badge"></a>
 <a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.6/AutomaticOnlineAnswerGUI.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.6/total?color=pink&style=for-the-badge"></a>
 <a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.5/AutoOA3.5.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.5/total?color=important&style=for-the-badge"></a>
@@ -27,6 +37,10 @@
 ---
 
 # 更新日志
+## 🍳 2022-03-28
+- 官方网址改为：https://bw.rsbsyzx.cn 
+- 修改版本号`v3.8`
+- `日日学`时间调整
 
 ## 🍳 2021-05-17
 - 加入在线人数统计，最新版本下载链接：[AutoOA_V3.7.exe](https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.7/AutoOA_V3.7.exe)

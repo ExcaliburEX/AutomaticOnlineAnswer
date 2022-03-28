@@ -17,9 +17,9 @@ import requests
 import re
 
 cookiesList = []
-log_url = 'https://bw.chinahrt.com.cn/#/login'
-url = 'https://bw.chinahrt.com.cn/#/'
-info_url = 'https://bw.chinahrt.com.cn/#/personal/learnStatistics'
+log_url = 'https://https://bw.rsbsyzx.cn/#/login'
+url = 'https://https://bw.rsbsyzx.cn/#/'
+info_url = 'https://https://bw.rsbsyzx.cn/#/personal/learnStatistics'
 user = ''
 password = ''
 data = None
@@ -500,17 +500,17 @@ def daydaylearn(num):
             driver.add_cookie(cookie)
         time.sleep(1)
         driver.refresh()
-        time.sleep(1)
+        time.sleep(3)
         driver.find_element_by_xpath(
             "//ul[@class='pb30 mt50']/li[1]").click()  # 日日学
-        time.sleep(1)
+        time.sleep(3)
         driver.find_element_by_xpath(
             "//a[@class='btn01_cui cursor mt100']").click()  # 开始答题
-        time.sleep(1)
+        time.sleep(3)
         driver.find_element_by_xpath(
             "//p[@class='cursor'][%s]" % (num)).click()
         driver.switch_to.window(driver.window_handles[-1])  # 切换到新窗口
-        time.sleep(1.5)
+        time.sleep(3)
         driver = ExclusiveChoice(driver)  # 单选
         driver = MultipleChoice(driver)  # 多选
         driver = TorF(driver)  # 判断
@@ -1453,7 +1453,7 @@ def GUI():
     headings = ['正确率', '正确题数', '错误题数', '总题量']
     layout = [
         # [sg.Menu(menu_def, tearoff=True)],
-        [sg.Text('人社窗口单位业务技能练兵比武V3.7完全版', size=(
+        [sg.Text('人社窗口单位业务技能练兵比武V3.8完全版', size=(
             40, 1), justification='center', font=("KaiTi", 18), relief=sg.RELIEF_RIDGE)],
         [sg.Text('请先获取验证码，进行登录，随后再进行各项进程，可多开。', size=(
             70, 1), font=("KaiTi", 10), text_color='blue')],
@@ -1555,7 +1555,7 @@ def GUI():
             t9 = threading.Thread(target=get_verification_cd, args=(
                 str(values['-USER-']), str(values['-PASSWORD-']), log_url, window))
             t9.start()
-        else:
+        elif event == sg.WIN_CLOSED or event == 'Exit':
             UpdateUserInMySQL(str(values['-USER-']))
             global flag
             flag = 0
