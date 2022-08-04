@@ -1,4 +1,6 @@
+from enum import auto
 from sys import flags
+from hamcrest import none
 import pymysql
 import PySimpleGUI as sg
 from selenium import webdriver
@@ -16,10 +18,9 @@ import socket
 import requests
 import re
 
-cookiesList = []
-log_url = 'https://https://bw.rsbsyzx.cn/#/login'
-url = 'https://https://bw.rsbsyzx.cn/#/'
-info_url = 'https://https://bw.rsbsyzx.cn/#/personal/learnStatistics'
+log_url = 'https://bw.rsbsyzx.cn/#/login'
+url = 'https://bw.rsbsyzx.cn/#/'
+info_url = 'https://bw.rsbsyzx.cn/#/personal/learnStatistics'
 user = ''
 password = ''
 data = None
@@ -27,7 +28,7 @@ login_flag = 0
 finish_flag = 0
 page = 0
 img = b'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'
-log_driver = None
+automaticDriver = None
 ansnum = 0
 anscnt = 0
 global flag
@@ -35,17 +36,7 @@ flag = 1
 
 
 def FetchStatistics():
-    chrome_opts = webdriver.ChromeOptions()
-    chrome_opts.add_argument("--headless")
-    chrome_opts.add_experimental_option('excludeSwitches', ['enable-logging'])
-    driver = webdriver.Chrome(options=chrome_opts)
-    driver.get(url)
-    time.sleep(1)
-    for cookie in cookiesList:
-        driver.add_cookie(cookie)
-    time.sleep(1)
-    driver.refresh()
-    time.sleep(1)
+    driver = automaticDriver
     driver.get(info_url)
     time.sleep(1)
     t1 = driver.find_element_by_xpath(
@@ -83,7 +74,6 @@ def FetchStatistics():
         "//div[@class='module_title_g module_title_g2 mb15'][3]/ul[@class='fr']/li[@class='li3']/p").text
     y4 = driver.find_element_by_xpath(
         "//div[@class='module_title_g module_title_g2 mb15'][3]/ul[@class='fr']/li[@class='li4']/p").text
-    driver.quit()
     return t1, t2, t3, t4, d1, d2, d3, d4, z1, z2, z3, z4, y1, y2, y3, y4
 
 
@@ -94,7 +84,8 @@ def FetchQuestionData():
     cnt = 1
     while True:
         try:
-            r = requests.get('https://blog-1259799643.cos.ap-shanghai.myqcloud.com/2021-5-8-%E9%A2%98%E5%BA%932.txt')
+            r = requests.get(
+                'https://blog-1259799643.cos.ap-shanghai.myqcloud.com/2021-5-8-%E9%A2%98%E5%BA%932.txt')
             r.encoding = 'gbk'
             global data
             data = r.text.replace('    ', ' ')
@@ -109,7 +100,7 @@ def FetchQuestionData():
             break
         except:
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),
-              "题库获取失败，超过三次建议重启或者更换网络，正在尝试第%d次" % (cnt))
+                  "题库获取失败，超过三次建议重启或者更换网络，正在尝试第%d次" % (cnt))
             cnt += 1
             if cnt == 5:
                 break
@@ -127,7 +118,6 @@ def open_browser(url):
 
 
 def login(user, password, url):
-    global cookiesList
     driver = open_browser(url)
     driver.set_window_size(width=800, height=800, windowHandle="current")
     driver.find_elements_by_class_name('el-input__inner')[0].clear()
@@ -141,11 +131,9 @@ def login(user, password, url):
             break
     time.sleep(1)
     driver.refresh()
-    cookiesList = driver.get_cookies()
     time.sleep(1)
     global login_flag
     login_flag = 1
-    driver.quit()
 
 
 def ModifyAnswer(driver):
@@ -196,11 +184,11 @@ def ExclusiveChoice(driver):
         try:
             if anscnt >= ansnum:
                 print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-                      time.localtime()), "日日练指定%d题完成！" % (ansnum))
-                driver.quit()
+                                    time.localtime()), "日日练指定%d题完成！" % (ansnum))
+                driver.close()
                 break
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-                  time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
+                                time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
             choice = driver.find_elements_by_xpath(
                 "//ul[@class='option_fl fl']/li/span[@class='circle_option fl']/a")
             random.choice(choice).click()
@@ -240,8 +228,8 @@ def MultipleChoice(driver):
         try:
             if anscnt >= ansnum:
                 print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-                      time.localtime()), "日日练指定%d题完成！" % (ansnum))
-                driver.quit()
+                                    time.localtime()), "日日练指定%d题完成！" % (ansnum))
+                driver.close()
                 break
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                 time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
@@ -306,7 +294,7 @@ def TorF(driver):
             "//a[@class='btn04_cui ml20']")
         if restart_button.text == '重新开始':
             restart_button.click()
-            sp(1)
+            time.sleep(1)
     except:
         pass
     while True:
@@ -314,7 +302,7 @@ def TorF(driver):
             if anscnt >= ansnum:
                 print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                     time.localtime()), "日日练指定%d题完成！" % (ansnum))
-                driver.quit()
+                driver.close()
                 break
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                 time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
@@ -363,7 +351,7 @@ def FillTheBlank(driver):
             if anscnt >= ansnum:
                 print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                     time.localtime()), "日日练指定%d题完成！" % (ansnum))
-                driver.quit()
+                driver.close()
                 break
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                 time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
@@ -417,7 +405,7 @@ def ShortAnswerQuestions(driver):
             if anscnt >= ansnum:
                 print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                     time.localtime()), "日日练指定%d题完成！" % (ansnum))
-                driver.quit()
+                driver.close()
                 break
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                 time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
@@ -465,7 +453,7 @@ def CaseQuestions(driver):
                 if anscnt >= ansnum:
                     print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                         time.localtime()), "日日练指定%d题完成！" % (ansnum))
-                    driver.quit()
+                    driver.close()
                     break
                 print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                     time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
@@ -495,11 +483,9 @@ def CaseQuestions(driver):
 def daydaylearn(num):
     print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()), "开始日日学！")
     try:
-        driver = open_browser(url)
-        for cookie in cookiesList:
-            driver.add_cookie(cookie)
-        time.sleep(1)
+        driver = automaticDriver
         driver.refresh()
+        driver.get(url)
         time.sleep(3)
         driver.find_element_by_xpath(
             "//ul[@class='pb30 mt50']/li[1]").click()  # 日日学
@@ -511,13 +497,18 @@ def daydaylearn(num):
             "//p[@class='cursor'][%s]" % (num)).click()
         driver.switch_to.window(driver.window_handles[-1])  # 切换到新窗口
         time.sleep(3)
-        driver = ExclusiveChoice(driver)  # 单选
-        driver = MultipleChoice(driver)  # 多选
-        driver = TorF(driver)  # 判断
-        driver = FillTheBlank(driver)
-        driver = ShortAnswerQuestions(driver)
-        driver = CaseQuestions(driver)
-        driver.quit()
+        if(anscnt < ansnum):
+            driver = ExclusiveChoice(driver)  # 单选
+        if(anscnt < ansnum):
+            driver = MultipleChoice(driver)  # 多选
+        if(anscnt < ansnum):
+            driver = TorF(driver)  # 判断
+        if(anscnt < ansnum):
+            driver = FillTheBlank(driver)
+        if(anscnt < ansnum):
+            driver = ShortAnswerQuestions(driver)
+        if(anscnt < ansnum):
+            driver = CaseQuestions(driver)
     except:
         pass
 
@@ -589,14 +580,15 @@ def is_Chinese(word):
 
 def monthmonthcompete(flag):
     if flag == 0:
-        print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()), "开始在线PK！")
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                            time.localtime()), "开始在线PK！")
     else:
-        print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()), "开始人机对战！")
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                            time.localtime()), "开始人机对战！")
 
     global page
-    driver = open_browser(url)
-    for cookie in cookiesList:
-        driver.add_cookie(cookie)
+    driver = automaticDriver
+    driver.get(url)
     time.sleep(1)
     driver.refresh()
     WebDriverWait(driver, 15).until(
@@ -615,27 +607,32 @@ def monthmonthcompete(flag):
         '//div[@id="app"]/section/div[2]/label/span[1]/span').click()  # 同意活动规则
     time.sleep(0.5)
     if flag == 0:
-        driver.find_element_by_xpath("//div[@class='imgText'][1]/img[@class='Clearfix fl mt20']").click()  # pk对战
+        driver.find_element_by_xpath(
+            "//div[@class='imgText'][1]/img[@class='Clearfix fl mt20']").click()  # pk对战
         time.sleep(1)
         while True:
             try:
-                driver.find_element_by_xpath("//div[@class='selectProvinceArea']/ul[@class='selectProvinceList']/li["+str(random.randint(1,29))+"]").click()  # 随机选择地区
+                driver.find_element_by_xpath(
+                    "//div[@class='selectProvinceArea']/ul[@class='selectProvinceList']/li["+str(random.randint(1, 29))+"]").click()  # 随机选择地区
                 break
             except:
                 pass
-            
+
         time.sleep(0.5)
-        driver.find_element_by_xpath("//div[@class='mt20 btnBattle tc']/a[@class='continueWait tc']").click()  # 继续按钮
+        driver.find_element_by_xpath(
+            "//div[@class='mt20 btnBattle tc']/a[@class='continueWait tc']").click()  # 继续按钮
         time.sleep(1)
         try:
-            driver.find_element_by_xpath("//div[@class='tc mt20 btnBattle']/a[@class='ml10 rjBattle']").click()  # 转而人机
+            driver.find_element_by_xpath(
+                "//div[@class='tc mt20 btnBattle']/a[@class='ml10 rjBattle']").click()  # 转而人机
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-                                    time.localtime()), "等不到人，还是人机吧！")
+                                time.localtime()), "等不到人，还是人机吧！")
         except:
             pass
     else:
-        driver.find_element_by_xpath('//div[@id="app"]/section/div[2]/div[1]/div[2]/img').click()  # 人机对战
-        
+        driver.find_element_by_xpath(
+            '//div[@id="app"]/section/div[2]/div[1]/div[2]/img').click()  # 人机对战
+
     time.sleep(1)
     driver.find_element_by_xpath(
         '//div[@id="app"]/section/div[3]/div/div/div[2]/section/div/div/p[2]/a').click()  # 随机试题
@@ -649,7 +646,7 @@ def monthmonthcompete(flag):
     # 之后进入答题过程，就10道题目，题量都确定的，就别想着while什么的了吧，真的变了再改脚本
     for i in range(10):
         print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-              time.localtime()), "正在做月月比第%d题" % (i+1))
+                            time.localtime()), "正在做月月比第%d题" % (i+1))
         questionType = driver.find_element_by_xpath(
             "//div[@class='answerArea mt30']/div[@class='answerType tc']").text[2:5]
         questionContent = driver.find_element_by_xpath(
@@ -832,10 +829,9 @@ def monthmonthcompete(flag):
 def weekweekpractice():
     print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()), "开始周周练进程！")
     global page
-    driver = open_browser(url)
-    for cookie in cookiesList:
-        driver.add_cookie(cookie)
+    driver = automaticDriver
     time.sleep(1)
+    driver.get(url)
     driver.refresh()
     time.sleep(1)
     driver.find_element_by_xpath(
@@ -902,7 +898,7 @@ def weekweekpractice():
             continue
         page += 1
         print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-              time.localtime()), "正在做周周练第%d题" % (page-1))
+                            time.localtime()), "正在做周周练第%d题" % (page-1))
         try:
             type_1 = driver.find_element_by_xpath(
                 "//h1[@class='exam_title_cui bg_white pl15 f18'][1]").text[0:3]
@@ -953,7 +949,7 @@ def weekweekpractice():
                     "//div[@class='fl'][5]/dl[@class='mt20 fl mr40']/dt")
             except:
                 print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-                      time.localtime()), "没有第四个选项")
+                                    time.localtime()), "没有第四个选项")
                 circleD = None
 
             choiceA = driver.find_element_by_xpath(
@@ -1017,7 +1013,7 @@ def weekweekpractice():
                     "//div[@class='fl'][5]/dl[@class='mt20 fl mr40']/dt")
             except:
                 print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-                      time.localtime()), "没有第四个选项")
+                                    time.localtime()), "没有第四个选项")
                 circleD = None
             choiceA = driver.find_element_by_xpath(
                 "//div[@class='fl'][2]/dl[@class='mt20 fl mr40']/dd").text
@@ -1195,7 +1191,7 @@ def UpdateData(window):
         time.sleep(1)
         if login_flag == 1:
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-                  time.localtime()), "正在获取历史答题数据...")
+                                time.localtime()), "正在获取历史答题数据...")
             t1, t2, t3, t4, d1, d2, d3, d4, z1, z2, z3, z4, y1, y2, y3, y4 = FetchStatistics()
             window.FindElement("-T1-").update(t1)
             window.FindElement("-T2-").update(t2)
@@ -1217,13 +1213,13 @@ def UpdateData(window):
             window.FindElement("-Y3-").update(y3)
             window.FindElement("-Y4-").update(y4)
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-                  time.localtime()), "数据刷新成功！")
+                                time.localtime()), "数据刷新成功！")
             login_flag = 0
 
         if finish_flag == 1:
 
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-                  time.localtime()), "正在获取历史答题数据...")
+                                time.localtime()), "正在获取历史答题数据...")
             t1, t2, t3, t4, d1, d2, d3, d4, z1, z2, z3, z4, y1, y2, y3, y4 = FetchStatistics()
             window.FindElement("-T1-").update(t1)
             window.FindElement("-T2-").update(t2)
@@ -1245,14 +1241,14 @@ def UpdateData(window):
             window.FindElement("-Y3-").update(y3)
             window.FindElement("-Y4-").update(y4)
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-                  time.localtime()), "数据刷新成功！")
+                                time.localtime()), "数据刷新成功！")
             finish_flag = 0
         if flag == 0:
             break
 
 
 def UpdateQuesData(window):
-    global flag 
+    global flag
     global page
     while True:
         time.sleep(1)
@@ -1277,16 +1273,22 @@ def transparent_back(img):
 
 def get_verification_cd(user, password, url, window):
     print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-          time.localtime()), "正在获取验证码...")
-    global log_driver
-    if user=='' or password=='':
+                        time.localtime()), "正在获取验证码...")
+    global automaticDriver
+    # 重新登录时关闭多余的浏览器窗口
+    if automaticDriver != None:
+        automaticDriver.close()
+        automaticDriver = none
+
+    if user == '' or password == '':
         print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-          time.localtime()), "请先输入账密！")
-        return 
+                            time.localtime()), "请先输入账密！")
+        return
     try:
         chrome_opts = webdriver.ChromeOptions()
-        chrome_opts.add_argument("--headless")
-        chrome_opts.add_experimental_option('excludeSwitches', ['enable-logging'])
+        # chrome_opts.add_argument("--headless")
+        chrome_opts.add_experimental_option(
+            'excludeSwitches', ['enable-logging'])
         driver = webdriver.Chrome(options=chrome_opts)
         driver.get(url)
         driver.set_window_size(width=800, height=800, windowHandle="current")
@@ -1315,46 +1317,46 @@ def get_verification_cd(user, password, url, window):
         imgNew = base64_data.decode('utf-8')
         imgNew = bytes(imgNew, encoding="utf8")
         window['safecode'].update(data=imgNew)
-        print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()), "获取验证码成功！")
-        log_driver = driver
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                            time.localtime()), "获取验证码成功！")
+        automaticDriver = driver
     except:
         print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-          time.localtime()), "chromedriver没有配置或者需要更新！")
+                            time.localtime()), "chromedriver没有配置或者需要更新！")
 
 
-def new_login(input_kapcatch,user):
-    global log_driver
-    global cookiesList
-    log_driver.find_elements_by_xpath(
+def new_login(input_kapcatch, user):
+    automaticDriver.find_elements_by_xpath(
         "//input[@class='el-input__inner']")[2].send_keys(input_kapcatch)
-    log_driver.find_element_by_xpath(
+    automaticDriver.find_element_by_xpath(
         "//input[@class='logbtn mt40 cursor']").click()
     time.sleep(1)
-    if log_driver.find_elements_by_class_name('el-input__inner') == []:
+    if automaticDriver.find_elements_by_class_name('el-input__inner') == []:
         print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()), "登录成功！")
-        if user!= '':
-            t_writeuser2mySQL = threading.Thread(target=WriteUser2MySQL, args=(user,))
+        if user != '':
+            t_writeuser2mySQL = threading.Thread(
+                target=WriteUser2MySQL, args=(user,))
             t_writeuser2mySQL.start()
-        log_driver.refresh()
-        cookiesList = log_driver.get_cookies()
+        automaticDriver.refresh()
+        cookiesList = automaticDriver.get_cookies()
         time.sleep(1)
         global login_flag
         login_flag = 1
-        log_driver.quit()
     else:
         print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                             time.localtime()), "登录失败，请重新获取验证码！")
-
 
 
 def MySQLConnect():
     global flag
     while True:
         try:
-            conn = pymysql.connect(host='47.96.189.80', port=3306,user="root", passwd="189154", db="AutoOA")
+            conn = pymysql.connect(
+                host='47.96.189.80', port=3306, user="root", passwd="189154", db="AutoOA")
             return conn
         except:
-            print(time.strftime("[%Y-%m-%d %H:%M:%S]: ", time.localtime()), '重连数据库中...')
+            print(time.strftime("[%Y-%m-%d %H:%M:%S]: ",
+                                time.localtime()), '重连数据库中...')
             time.sleep(2)
             try:
                 conn.close()
@@ -1366,7 +1368,6 @@ def MySQLConnect():
             except:
                 pass
             break
-    
 
 
 def UpdateOnlineUserNum(window):
@@ -1381,9 +1382,11 @@ def UpdateOnlineUserNum(window):
             number = res[0]
             window['-USERNUM-'].update(number)
             if number > old:
-                print(time.strftime("[%Y-%m-%d %H:%M:%S]: ", time.localtime()), '当前有%d位学习者加入了战斗！'%(number-old))
+                print(time.strftime(
+                    "[%Y-%m-%d %H:%M:%S]: ", time.localtime()), '当前有%d位学习者加入了战斗！' % (number-old))
             elif number < old:
-                print(time.strftime("[%Y-%m-%d %H:%M:%S]: ", time.localtime()), '当前有%d位学习者离开了战斗~'%(old-number))
+                print(time.strftime(
+                    "[%Y-%m-%d %H:%M:%S]: ", time.localtime()), '当前有%d位学习者离开了战斗~' % (old-number))
             old = number
             cursor.close()
             conn.close()
@@ -1392,7 +1395,7 @@ def UpdateOnlineUserNum(window):
             pass
         if flag == 0:
             break
-        
+
 
 def GetIP():
     req = requests.get("http://txt.go.sohu.com/ip/soip")
@@ -1403,20 +1406,23 @@ def GetIP():
 def WriteUser2MySQL(account):
     conn = MySQLConnect()
     cursor = conn.cursor()
-    cursor.execute("SELECT * from user where user_account = '%s'"%(account))
+    cursor.execute("SELECT * from user where user_account = '%s'" % (account))
     res = cursor.fetchall()
     try:
         ip = GetIP()
     except:
         ip = '6.6.6.6'
     if len(res) == 0:
-        cursor.execute("insert into user(user_ip,user_account,onlineState) values('%s','%s','T')"%(str(ip),str(account)))
+        cursor.execute("insert into user(user_ip,user_account,onlineState) values('%s','%s','T')" % (
+            str(ip), str(account)))
     else:
-        cursor.execute("UPDATE user SET user_ip='%s', onlineState='T' WHERE user_account='%s'"%(str(ip),str(account)))
+        cursor.execute("UPDATE user SET user_ip='%s', onlineState='T' WHERE user_account='%s'" % (
+            str(ip), str(account)))
     cursor.close()
     conn.commit()
     conn.close()
-        
+
+
 def UpdateUserInMySQL(account):
     try:
         conn = MySQLConnect()
@@ -1425,13 +1431,13 @@ def UpdateUserInMySQL(account):
             ip = GetIP()
         except:
             ip = '6.6.6.6'
-        cursor.execute("UPDATE user SET user_ip='%s', onlineState='F' WHERE user_account='%s'"%(str(ip),str(account)))
+        cursor.execute("UPDATE user SET user_ip='%s', onlineState='F' WHERE user_account='%s'" % (
+            str(ip), str(account)))
         cursor.close()
         conn.commit()
         conn.close()
     except:
         pass
-        
 
 
 def GUI():
@@ -1457,35 +1463,35 @@ def GUI():
             40, 1), justification='center', font=("KaiTi", 18), relief=sg.RELIEF_RIDGE)],
         [sg.Text('请先获取验证码，进行登录，随后再进行各项进程，可多开。', size=(
             70, 1), font=("KaiTi", 10), text_color='blue')],
-        [sg.Text('当前在线用户数：', font=("KaiTi", 12), size=(18, 1)),sg.Text('暂无数据', font=("Comic Sans MS", 12),
-                    size=(18, 1), relief=sg.RELIEF_RIDGE, key='-USERNUM-')],
+        [sg.Text('当前在线用户数：', font=("KaiTi", 12), size=(18, 1)), sg.Text('暂无数据', font=("Comic Sans MS", 12),
+                                                                        size=(18, 1), relief=sg.RELIEF_RIDGE, key='-USERNUM-')],
         [sg.Frame('登录选项', [[sg.Text('账号：', font=("KaiTi", 10)),
-                           sg.InputText('', size=(
-                               80, 1), key='-USER-')],
+                            sg.InputText('', size=(
+                                80, 1), key='-USER-')],
                            [sg.Text('密码：', font=("KaiTi", 10)),
                             sg.InputText('', key='-PASSWORD-', size=(
-                                80, 1))], [sg.Frame('验证码', [[sg.Image(data=img, key='safecode'), sg.Button('获取验证码', key='GETCODE', size=(10, 2),font=("KaiTi", 10)), sg.InputText('', key='CODEBLANK')]], font=("KaiTi", 18)),
+                                80, 1))], [sg.Frame('验证码', [[sg.Image(data=img, key='safecode'), sg.Button('获取验证码', key='GETCODE', size=(10, 2), font=("KaiTi", 10)), sg.InputText('', key='CODEBLANK')]], font=("KaiTi", 18)),
                                            sg.Button('登录', font=("KaiTi", 12), button_color=('white', 'green'), size=(8, 4))]], font=("KaiTi", 25), title_color='Tomato')],
         [sg.Frame('日日学', [[sg.Text('设置学习题数：', font=("KaiTi", 10)), sg.InputText('30', key='ANSNUM')], [sg.Button('习中特、党十九大精神', font=("KaiTi", 12), button_color=(
             'white', 'red'), size=(37, 1)),
             sg.Button('就业创业', font=("KaiTi", 12), button_color=('white', 'purple'), size=(37, 1))],
             [sg.Button('社会保险', font=("KaiTi", 12), button_color=('white', 'blue'), size=(37, 1)),
-         sg.Button('劳动关系', font=("KaiTi", 12), button_color=('black', 'yellow'), size=(37, 1))],
+             sg.Button('劳动关系', font=("KaiTi", 12), button_color=('black', 'yellow'), size=(37, 1))],
             [sg.Button('人事人才', font=("KaiTi", 12), button_color=('white', 'orange'), size=(37, 1)),
              sg.Button('综合服务标准规范', font=("KaiTi", 12), button_color=(
                  'white', 'black'), size=(37, 1))]], font=("KaiTi", 25))],
         [sg.Frame('周周练', [[sg.Button('启动周周练答题进程', font=("KaiTi", 14), button_color=(
             'yellow', 'purple'), size=(61, 1))]], font=("KaiTi", 25))],
         [sg.Frame('月月比', [[sg.Button('在线PK', font=("KaiTi", 14), button_color=(
-            'white', 'green'), size=(29, 1)),sg.Button('人机对战', font=("KaiTi", 14), button_color=(
-            'white', 'orange'), size=(29, 1))]], font=("KaiTi", 25))],
+            'white', 'green'), size=(29, 1)), sg.Button('人机对战', font=("KaiTi", 14), button_color=(
+                'white', 'orange'), size=(29, 1))]], font=("KaiTi", 25))],
         [sg.Text('当前周周练做题进度：', font=("KaiTi", 10)), sg.Text('无数据', size=(6, 1), text_color='pink', font=(
             "KaiTi", 15), relief=sg.RELIEF_RIDGE, key='-PROGRESS-', pad=(0, 0))],
         # [sg.Text('  ')] + [sg.Text(h, size=(6, 1), font=("KaiTi", 10))
         #                    for h in headings],
         # [sg.Frame('数据展示', [[sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), text_color='blue', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-T1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-T2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-T3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-T4-', pad=(0, 0))]
         #                                      ], title='汇总情况', title_color='red', relief=sg.RELIEF_SUNKEN, font=("KaiTi", 8), tooltip='Use these to set flags')],
-         [sg.Frame('数据展示', [[sg.Text("  "+h, size=(8, 1), font=("KaiTi", 8), pad=(0, 0))
+        [sg.Frame('数据展示', [[sg.Text("  "+h, size=(8, 1), font=("KaiTi", 8), pad=(0, 0))
                             for h in headings],
                            [sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), text_color='blue', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-T1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-T2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-T3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), text_color='blue', font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-T4-', pad=(0, 0))]
                                              ], title='汇总情况', title_color='red', relief=sg.RELIEF_SUNKEN, font=("KaiTi", 8), tooltip='Use these to set flags')],
@@ -1498,13 +1504,12 @@ def GUI():
         [sg.Cancel('退出', font=("KaiTi", 10), button_color=('white', 'red'), size=(6, 2))]]
 
     window = sg.Window('自动答题系统V3.7', layout,
-                       default_element_size=(40, 1), grab_anywhere=False, resizable=True, text_justification='center',finalize=True)
+                       default_element_size=(40, 1), grab_anywhere=False, resizable=True, text_justification='center', finalize=True)
 
-    T_data = threading.Thread(target=UpdateData, args=(window,))
-    T_data.start()
     T_ques_data = threading.Thread(target=UpdateQuesData, args=(window,))
     T_ques_data.start()
-    t_OnlineUserNum = threading.Thread(target=UpdateOnlineUserNum,args=(window,))
+    t_OnlineUserNum = threading.Thread(
+        target=UpdateOnlineUserNum, args=(window,))
     t_OnlineUserNum.start()
     global ansnum
     while True:
@@ -1513,7 +1518,8 @@ def GUI():
         if event == '登录':
             # t1 = threading.Thread(target=login, args=(str(values['-USER-']), str(values['-PASSWORD-']), log_url))
             input_kapcatch = values['CODEBLANK']
-            t1 = threading.Thread(target=new_login, args=(input_kapcatch,str(values['-USER-'])))
+            t1 = threading.Thread(target=new_login, args=(
+                input_kapcatch, str(values['-USER-'])))
             t1.start()
 
         elif event == '习中特、党十九大精神':
