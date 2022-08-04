@@ -10,11 +10,11 @@ import threading
 import requests
 import base64
 import os
+import sys
 from selenium.webdriver.support import \
     expected_conditions as ExpectedConditions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-import socket
 import requests
 import re
 
@@ -33,48 +33,56 @@ ansnum = 0
 anscnt = 0
 global flag
 flag = 1
+global chromeDriverLock
+chromeDriverLock = None
 
 
 def FetchStatistics():
-    driver = automaticDriver
-    driver.get(info_url)
-    time.sleep(1)
-    t1 = driver.find_element_by_xpath(
-        "//div[@class='module_title_g mb15 question_sum_top']/ul[@class='fr']/li[@class='li1']/p[2]").text
-    t2 = driver.find_element_by_xpath(
-        "//div[@class='module_title_g mb15 question_sum_top']/ul[@class='fr']/li[@class='li2']/p[2]").text
-    t3 = driver.find_element_by_xpath(
-        "//div[@class='module_title_g mb15 question_sum_top']/ul[@class='fr']/li[@class='li3']/p[2]").text
-    t4 = driver.find_element_by_xpath(
-        "//div[@class='module_title_g mb15 question_sum_top']/ul[@class='fr']/li[@class='li4']/p[2]").text
+    if chromeDriverLock.acquire(blocking=False) == False:
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),
+              "有其它操作进行中，稍后再开始新操作吧！")
+        return -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+    else:
+        driver = automaticDriver
+        driver.get(info_url)
+        time.sleep(1)
+        t1 = driver.find_element_by_xpath(
+            "//div[@class='module_title_g mb15 question_sum_top']/ul[@class='fr']/li[@class='li1']/p[2]").text
+        t2 = driver.find_element_by_xpath(
+            "//div[@class='module_title_g mb15 question_sum_top']/ul[@class='fr']/li[@class='li2']/p[2]").text
+        t3 = driver.find_element_by_xpath(
+            "//div[@class='module_title_g mb15 question_sum_top']/ul[@class='fr']/li[@class='li3']/p[2]").text
+        t4 = driver.find_element_by_xpath(
+            "//div[@class='module_title_g mb15 question_sum_top']/ul[@class='fr']/li[@class='li4']/p[2]").text
 
-    d1 = driver.find_element_by_xpath(
-        "//div[@class='module_title_g module_title_g2 mb15'][1]/ul[@class='fr']/li[@class='li1']/p").text
-    d2 = driver.find_element_by_xpath(
-        "//div[@class='module_title_g module_title_g2 mb15'][1]/ul[@class='fr']/li[@class='li2']/p").text
-    d3 = driver.find_element_by_xpath(
-        "//div[@class='module_title_g module_title_g2 mb15'][1]/ul[@class='fr']/li[@class='li3']/p").text
-    d4 = driver.find_element_by_xpath(
-        "//div[@class='module_title_g module_title_g2 mb15'][1]/ul[@class='fr']/li[@class='li4']/p").text
+        d1 = driver.find_element_by_xpath(
+            "//div[@class='module_title_g module_title_g2 mb15'][1]/ul[@class='fr']/li[@class='li1']/p").text
+        d2 = driver.find_element_by_xpath(
+            "//div[@class='module_title_g module_title_g2 mb15'][1]/ul[@class='fr']/li[@class='li2']/p").text
+        d3 = driver.find_element_by_xpath(
+            "//div[@class='module_title_g module_title_g2 mb15'][1]/ul[@class='fr']/li[@class='li3']/p").text
+        d4 = driver.find_element_by_xpath(
+            "//div[@class='module_title_g module_title_g2 mb15'][1]/ul[@class='fr']/li[@class='li4']/p").text
 
-    z1 = driver.find_element_by_xpath(
-        "//div[@class='module_title_g module_title_g2 mb15'][2]/ul[@class='fr']/li[@class='li1']/p").text
-    z2 = driver.find_element_by_xpath(
-        "//div[@class='module_title_g module_title_g2 mb15'][2]/ul[@class='fr']/li[@class='li2']/p").text
-    z3 = driver.find_element_by_xpath(
-        "//div[@class='module_title_g module_title_g2 mb15'][2]/ul[@class='fr']/li[@class='li3']/p").text
-    z4 = driver.find_element_by_xpath(
-        "//div[@class='module_title_g module_title_g2 mb15'][2]/ul[@class='fr']/li[@class='li4']/p").text
+        z1 = driver.find_element_by_xpath(
+            "//div[@class='module_title_g module_title_g2 mb15'][2]/ul[@class='fr']/li[@class='li1']/p").text
+        z2 = driver.find_element_by_xpath(
+            "//div[@class='module_title_g module_title_g2 mb15'][2]/ul[@class='fr']/li[@class='li2']/p").text
+        z3 = driver.find_element_by_xpath(
+            "//div[@class='module_title_g module_title_g2 mb15'][2]/ul[@class='fr']/li[@class='li3']/p").text
+        z4 = driver.find_element_by_xpath(
+            "//div[@class='module_title_g module_title_g2 mb15'][2]/ul[@class='fr']/li[@class='li4']/p").text
 
-    y1 = driver.find_element_by_xpath(
-        "//div[@class='module_title_g module_title_g2 mb15'][3]/ul[@class='fr']/li[@class='li1']/p").text
-    y2 = driver.find_element_by_xpath(
-        "//div[@class='module_title_g module_title_g2 mb15'][3]/ul[@class='fr']/li[@class='li2']/p").text
-    y3 = driver.find_element_by_xpath(
-        "//div[@class='module_title_g module_title_g2 mb15'][3]/ul[@class='fr']/li[@class='li3']/p").text
-    y4 = driver.find_element_by_xpath(
-        "//div[@class='module_title_g module_title_g2 mb15'][3]/ul[@class='fr']/li[@class='li4']/p").text
-    return t1, t2, t3, t4, d1, d2, d3, d4, z1, z2, z3, z4, y1, y2, y3, y4
+        y1 = driver.find_element_by_xpath(
+            "//div[@class='module_title_g module_title_g2 mb15'][3]/ul[@class='fr']/li[@class='li1']/p").text
+        y2 = driver.find_element_by_xpath(
+            "//div[@class='module_title_g module_title_g2 mb15'][3]/ul[@class='fr']/li[@class='li2']/p").text
+        y3 = driver.find_element_by_xpath(
+            "//div[@class='module_title_g module_title_g2 mb15'][3]/ul[@class='fr']/li[@class='li3']/p").text
+        y4 = driver.find_element_by_xpath(
+            "//div[@class='module_title_g module_title_g2 mb15'][3]/ul[@class='fr']/li[@class='li4']/p").text
+        chromeDriverLock.release()
+        return t1, t2, t3, t4, d1, d2, d3, d4, z1, z2, z3, z4, y1, y2, y3, y4
 
 
 def FetchQuestionData():
@@ -118,8 +126,13 @@ def open_browser(url):
 
 
 def login(user, password, url):
+    if chromeDriverLock.acquire(blocking=False) == False:
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),
+              "有其它操作进行中，稍后再开始新操作吧！")
+        return
+
     driver = open_browser(url)
-    driver.set_window_size(width=800, height=800, windowHandle="current")
+    driver.set_window_size(width=800, height=1000, windowHandle="current")
     driver.find_elements_by_class_name('el-input__inner')[0].clear()
     driver.find_elements_by_class_name(
         'el-input__inner')[0].send_keys(user)
@@ -134,6 +147,7 @@ def login(user, password, url):
     time.sleep(1)
     global login_flag
     login_flag = 1
+    chromeDriverLock.release()
 
 
 def ModifyAnswer(driver):
@@ -481,6 +495,11 @@ def CaseQuestions(driver):
 
 
 def daydaylearn(num):
+    if chromeDriverLock.acquire(blocking=False) == False:
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),
+              "有其它操作进行中，稍后再开始新操作吧！")
+        return
+
     print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()), "开始日日学！")
     try:
         driver = automaticDriver
@@ -511,6 +530,8 @@ def daydaylearn(num):
             driver = CaseQuestions(driver)
     except:
         pass
+    finally:
+        chromeDriverLock.release()
 
 
 def FindExclusiveAnswer(question):
@@ -579,6 +600,11 @@ def is_Chinese(word):
 
 
 def monthmonthcompete(flag):
+    if chromeDriverLock.acquire(blocking=False) == False:
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),
+              "有其它操作进行中，稍后再开始新操作吧！")
+        return
+
     if flag == 0:
         print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                             time.localtime()), "开始在线PK！")
@@ -824,9 +850,15 @@ def monthmonthcompete(flag):
         time.sleep(1)
     print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                         time.localtime()), "月月比完成，请查看成绩！")
+    chromeDriverLock.release()
 
 
 def weekweekpractice():
+    if chromeDriverLock.acquire(blocking=False) == False:
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()),
+              "有其它操作进行中，稍后再开始新操作吧！")
+        return
+
     print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()), "开始周周练进程！")
     global page
     driver = automaticDriver
@@ -1182,69 +1214,35 @@ def weekweekpractice():
         except:
             break
 
+    chromeDriverLock.release()
+
 
 def UpdateData(window):
-    global login_flag
-    global finish_flag
-    global flag
-    while True:
-        time.sleep(1)
-        if login_flag == 1:
-            print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-                                time.localtime()), "正在获取历史答题数据...")
-            t1, t2, t3, t4, d1, d2, d3, d4, z1, z2, z3, z4, y1, y2, y3, y4 = FetchStatistics()
-            window.FindElement("-T1-").update(t1)
-            window.FindElement("-T2-").update(t2)
-            window.FindElement("-T3-").update(t3)
-            window.FindElement("-T4-").update(t4)
+    print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                        time.localtime()), "正在获取历史答题数据...")
+    t1, t2, t3, t4, d1, d2, d3, d4, z1, z2, z3, z4, y1, y2, y3, y4 = FetchStatistics()
+    if t1 != -1:
+        window.FindElement("-T1-").update(t1)
+        window.FindElement("-T2-").update(t2)
+        window.FindElement("-T3-").update(t3)
+        window.FindElement("-T4-").update(t4)
 
-            window.FindElement("-D1-").update(d1)
-            window.FindElement("-D2-").update(d2)
-            window.FindElement("-D3-").update(d3)
-            window.FindElement("-D4-").update(d4)
+        window.FindElement("-D1-").update(d1)
+        window.FindElement("-D2-").update(d2)
+        window.FindElement("-D3-").update(d3)
+        window.FindElement("-D4-").update(d4)
 
-            window.FindElement("-Z1-").update(z1)
-            window.FindElement("-Z2-").update(z2)
-            window.FindElement("-Z3-").update(z3)
-            window.FindElement("-Z4-").update(z4)
+        window.FindElement("-Z1-").update(z1)
+        window.FindElement("-Z2-").update(z2)
+        window.FindElement("-Z3-").update(z3)
+        window.FindElement("-Z4-").update(z4)
 
-            window.FindElement("-Y1-").update(y1)
-            window.FindElement("-Y2-").update(y2)
-            window.FindElement("-Y3-").update(y3)
-            window.FindElement("-Y4-").update(y4)
-            print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-                                time.localtime()), "数据刷新成功！")
-            login_flag = 0
-
-        if finish_flag == 1:
-
-            print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-                                time.localtime()), "正在获取历史答题数据...")
-            t1, t2, t3, t4, d1, d2, d3, d4, z1, z2, z3, z4, y1, y2, y3, y4 = FetchStatistics()
-            window.FindElement("-T1-").update(t1)
-            window.FindElement("-T2-").update(t2)
-            window.FindElement("-T3-").update(t3)
-            window.FindElement("-T4-").update(t4)
-
-            window.FindElement("-D1-").update(d1)
-            window.FindElement("-D2-").update(d2)
-            window.FindElement("-D3-").update(d3)
-            window.FindElement("-D4-").update(d4)
-
-            window.FindElement("-Z1-").update(z1)
-            window.FindElement("-Z2-").update(z2)
-            window.FindElement("-Z3-").update(z3)
-            window.FindElement("-Z4-").update(z4)
-
-            window.FindElement("-Y1-").update(y1)
-            window.FindElement("-Y2-").update(y2)
-            window.FindElement("-Y3-").update(y3)
-            window.FindElement("-Y4-").update(y4)
-            print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
-                                time.localtime()), "数据刷新成功！")
-            finish_flag = 0
-        if flag == 0:
-            break
+        window.FindElement("-Y1-").update(y1)
+        window.FindElement("-Y2-").update(y2)
+        window.FindElement("-Y3-").update(y3)
+        window.FindElement("-Y4-").update(y4)
+        print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
+                            time.localtime()), "数据刷新成功！")
 
 
 def UpdateQuesData(window):
@@ -1252,9 +1250,9 @@ def UpdateQuesData(window):
     global page
     while True:
         time.sleep(1)
-        window.FindElement("-PROGRESS-").update(page-1)
         if flag == 0:
             break
+        window.FindElement("-PROGRESS-").update(page-1)
 
 
 def transparent_back(img):
@@ -1461,7 +1459,7 @@ def GUI():
         # [sg.Menu(menu_def, tearoff=True)],
         [sg.Text('人社窗口单位业务技能练兵比武V3.8完全版', size=(
             40, 1), justification='center', font=("KaiTi", 18), relief=sg.RELIEF_RIDGE)],
-        [sg.Text('请先获取验证码，进行登录，随后再进行各项进程，可多开。', size=(
+        [sg.Text('请先获取验证码，进行登录，随后再进行各项进程，一次只能运行一项进程。', size=(
             70, 1), font=("KaiTi", 10), text_color='blue')],
         [sg.Text('当前在线用户数：', font=("KaiTi", 12), size=(18, 1)), sg.Text('暂无数据', font=("Comic Sans MS", 12),
                                                                         size=(18, 1), relief=sg.RELIEF_RIDGE, key='-USERNUM-')],
@@ -1501,11 +1499,13 @@ def GUI():
                                              ], title='周周练', title_color='red', relief=sg.RELIEF_SUNKEN, font=("KaiTi", 8), tooltip='Use these to set flags')],
                            [sg.Frame(layout=[[sg.Text('无数据', size=(8, 1), font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-Y1-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-Y2-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-Y3-', pad=(0, 0)), sg.Text('无数据', size=(8, 1), font=("KaiTi", 8), relief=sg.RELIEF_RIDGE, key='-Y4-', pad=(0, 0))]
                                              ], title='月月比', title_color='red', relief=sg.RELIEF_SUNKEN, font=("KaiTi", 10), tooltip='Use these to set flags')]], font=("KaiTi", 10)), sg.Output(size=(50, 10))],
-        [sg.Cancel('退出', font=("KaiTi", 10), button_color=('white', 'red'), size=(6, 2))]]
+        [sg.Button('退出', font=("KaiTi", 10), button_color=('white', 'red'), size=(6, 2)), sg.Button('刷新统计信息', font=("KaiTi", 10), button_color=('white', 'red'), size=(15, 2))]]
 
     window = sg.Window('自动答题系统V3.7', layout,
                        default_element_size=(40, 1), grab_anywhere=False, resizable=True, text_justification='center', finalize=True)
 
+    global chromeDriverLock
+    chromeDriverLock = threading.Lock()
     T_ques_data = threading.Thread(target=UpdateQuesData, args=(window,))
     T_ques_data.start()
     t_OnlineUserNum = threading.Thread(
@@ -1561,16 +1561,19 @@ def GUI():
             t9 = threading.Thread(target=get_verification_cd, args=(
                 str(values['-USER-']), str(values['-PASSWORD-']), log_url, window))
             t9.start()
-        elif event == sg.WIN_CLOSED or event == 'Exit':
+        elif event == sg.WIN_CLOSED or event == 'Exit' or event == '退出':
             UpdateUserInMySQL(str(values['-USER-']))
             global flag
             flag = 0
+            sys.exit(0)
             break
-        # sg.Popup('Title',
-        #         'THE RESULTS OF THE WINDOW.',
-        #         'THE BUTTON CLICKED WAS "{}"'.FORMAT(EVENT),
-        #         'THE VALUES ARE', VALUES)
-    window.close()
+        elif event == '刷新统计信息':
+            t10 = threading.Thread(target=UpdateData, args=(window,))
+            t10.start()
+            # sg.Popup('Title',
+            #         'THE RESULTS OF THE WINDOW.',
+            #         'THE BUTTON CLICKED WAS "{}"'.FORMAT(EVENT),
+            #         'THE VALUES ARE', VALUES)
 
 
 if __name__ == "__main__":
