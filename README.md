@@ -15,10 +15,10 @@
 
 <h3 align="center">最新版本</h3>
 
-<h3 align="center"><a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.8/AutoOA_V3.8.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.8/total?color=purple&style=for-the-badge"></a></h3>
+<h3 align="center"><a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.9/AutoOA_V3.9.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.9/total?color=red&style=for-the-badge"></a></h3>
 
 ---
-
+<a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.8/AutoOA_V3.8.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.8/total?color=purple&style=for-the-badge"></a>
 <a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.7/AutoOA_V3.7.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.7/total?color=blue&style=for-the-badge"></a>
 <a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.6/AutomaticOnlineAnswerGUI.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.6/total?color=pink&style=for-the-badge"></a>
 <a href= 'https://github.com/ExcaliburEX/AutomaticOnlineAnswer/releases/download/V3.5/AutoOA3.5.exe'><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/downloads/ExcaliburEX/AutomaticOnlineAnswer/V3.5/total?color=important&style=for-the-badge"></a>
@@ -37,6 +37,14 @@
 ---
 
 # 更新日志
+
+## 😓 2022-08-04
+- 版本升级为V3.9
+- 跟随网站更改更新自动进程的执行方式
+- 优化资源泄露
+Tips：由于网站机制改变，任务无法多开，请按顺序学习。
+TTTips：请注意，本次更新由@miaoxw完成，衷心感谢@miaoxw的工作！
+
 ## 🍳 2022-08-04
 - 尽力修复了关闭程序时的资源泄漏问题
 - 根据官方网站的cookie机制调整修改了自动进程的工作方式，**但也导致自动进程不能再多开**，必须逐个运行。前一个进程没有运行结束前，不要开启下一个自动进程
