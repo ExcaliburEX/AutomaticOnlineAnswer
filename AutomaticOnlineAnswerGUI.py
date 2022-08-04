@@ -1252,7 +1252,10 @@ def UpdateQuesData(window):
         time.sleep(1)
         if flag == 0:
             break
+        try:
         window.FindElement("-PROGRESS-").update(page-1)
+        except:
+            pass
 
 
 def transparent_back(img):
@@ -1323,7 +1326,8 @@ def get_verification_cd(user, password, url, window):
                             time.localtime()), "chromedriver没有配置或者需要更新！")
 
 
-def new_login(input_kapcatch, user):
+def new_login(input_kapcatch, _user):
+    global user
     automaticDriver.find_elements_by_xpath(
         "//input[@class='el-input__inner']")[2].send_keys(input_kapcatch)
     automaticDriver.find_element_by_xpath(
@@ -1331,15 +1335,16 @@ def new_login(input_kapcatch, user):
     time.sleep(1)
     if automaticDriver.find_elements_by_class_name('el-input__inner') == []:
         print(time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime()), "登录成功！")
-        if user != '':
+        if _user != '':
             t_writeuser2mySQL = threading.Thread(
-                target=WriteUser2MySQL, args=(user,))
+                target=WriteUser2MySQL, args=(_user,))
             t_writeuser2mySQL.start()
         automaticDriver.refresh()
         cookiesList = automaticDriver.get_cookies()
         time.sleep(1)
         global login_flag
         login_flag = 1
+        user = _user
     else:
         print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                             time.localtime()), "登录失败，请重新获取验证码！")
@@ -1514,7 +1519,6 @@ def GUI():
     global ansnum
     while True:
         event, values = window.read()
-        ansnum = int(values['ANSNUM'])
         if event == '登录':
             # t1 = threading.Thread(target=login, args=(str(values['-USER-']), str(values['-PASSWORD-']), log_url))
             input_kapcatch = values['CODEBLANK']
@@ -1562,7 +1566,7 @@ def GUI():
                 str(values['-USER-']), str(values['-PASSWORD-']), log_url, window))
             t9.start()
         elif event == sg.WIN_CLOSED or event == 'Exit' or event == '退出':
-            UpdateUserInMySQL(str(values['-USER-']))
+            UpdateUserInMySQL(str(user))
             global flag
             flag = 0
             sys.exit(0)
@@ -1570,10 +1574,7 @@ def GUI():
         elif event == '刷新统计信息':
             t10 = threading.Thread(target=UpdateData, args=(window,))
             t10.start()
-            # sg.Popup('Title',
-            #         'THE RESULTS OF THE WINDOW.',
-            #         'THE BUTTON CLICKED WAS "{}"'.FORMAT(EVENT),
-            #         'THE VALUES ARE', VALUES)
+        ansnum = int(values['ANSNUM'])
 
 
 if __name__ == "__main__":
