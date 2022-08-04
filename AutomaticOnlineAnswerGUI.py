@@ -1253,7 +1253,7 @@ def UpdateQuesData(window):
         if flag == 0:
             break
         try:
-        window.FindElement("-PROGRESS-").update(page-1)
+            window.FindElement("-PROGRESS-").update(page-1)
         except:
             pass
 
@@ -1462,7 +1462,7 @@ def GUI():
     headings = ['正确率', '正确题数', '错误题数', '总题量']
     layout = [
         # [sg.Menu(menu_def, tearoff=True)],
-        [sg.Text('人社窗口单位业务技能练兵比武V3.8完全版', size=(
+        [sg.Text('人社窗口单位业务技能练兵比武V3.9完全版', size=(
             40, 1), justification='center', font=("KaiTi", 18), relief=sg.RELIEF_RIDGE)],
         [sg.Text('请先获取验证码，进行登录，随后再进行各项进程，一次只能运行一项进程。', size=(
             70, 1), font=("KaiTi", 10), text_color='blue')],
@@ -1506,7 +1506,7 @@ def GUI():
                                              ], title='月月比', title_color='red', relief=sg.RELIEF_SUNKEN, font=("KaiTi", 10), tooltip='Use these to set flags')]], font=("KaiTi", 10)), sg.Output(size=(50, 10))],
         [sg.Button('退出', font=("KaiTi", 10), button_color=('white', 'red'), size=(6, 2)), sg.Button('刷新统计信息', font=("KaiTi", 10), button_color=('white', 'red'), size=(15, 2))]]
 
-    window = sg.Window('自动答题系统V3.7', layout,
+    window = sg.Window('自动答题系统V3.9', layout,
                        default_element_size=(40, 1), grab_anywhere=False, resizable=True, text_justification='center', finalize=True)
 
     global chromeDriverLock
