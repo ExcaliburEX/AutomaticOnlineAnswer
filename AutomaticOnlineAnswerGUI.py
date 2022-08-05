@@ -200,6 +200,7 @@ def ExclusiveChoice(driver):
                 print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                     time.localtime()), "日日练指定%d题完成！" % (ansnum))
                 driver.close()
+                driver.switch_to.window(driver.window_handles[0])
                 break
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                 time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
@@ -244,6 +245,7 @@ def MultipleChoice(driver):
                 print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                     time.localtime()), "日日练指定%d题完成！" % (ansnum))
                 driver.close()
+                driver.switch_to.window(driver.window_handles[0])
                 break
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                 time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
@@ -317,6 +319,7 @@ def TorF(driver):
                 print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                     time.localtime()), "日日练指定%d题完成！" % (ansnum))
                 driver.close()
+                driver.switch_to.window(driver.window_handles[0])
                 break
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                 time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
@@ -366,6 +369,7 @@ def FillTheBlank(driver):
                 print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                     time.localtime()), "日日练指定%d题完成！" % (ansnum))
                 driver.close()
+                driver.switch_to.window(driver.window_handles[0])
                 break
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                 time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
@@ -420,6 +424,7 @@ def ShortAnswerQuestions(driver):
                 print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                     time.localtime()), "日日练指定%d题完成！" % (ansnum))
                 driver.close()
+                driver.switch_to.window(driver.window_handles[0])
                 break
             print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                 time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
@@ -468,6 +473,7 @@ def CaseQuestions(driver):
                     print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                         time.localtime()), "日日练指定%d题完成！" % (ansnum))
                     driver.close()
+                    driver.switch_to.window(driver.window_handles[0])
                     break
                 print(time.strftime("[%Y-%m-%d %H:%M:%S] ",
                                     time.localtime()), "日日练正在做第%d题！" % (anscnt+1))
@@ -506,6 +512,7 @@ def daydaylearn(num):
         driver.refresh()
         driver.get(url)
         time.sleep(3)
+        anscnt = 0
         driver.find_element_by_xpath(
             "//ul[@class='pb30 mt50']/li[1]").click()  # 日日学
         time.sleep(3)
